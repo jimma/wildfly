@@ -103,7 +103,6 @@ public final class EndpointService implements Service<Endpoint> {
     @Override
     public void stop(final StopContext context) {
         ROOT_LOGGER.stopping(name);
-        endpoint.getLifecycleHandler().stop(endpoint);
         endpoint.setSecurityDomainContext(null);
         unregisterEndpoint(endpoint);
         final List<RecordProcessor> processors = endpoint.getRecordProcessors();

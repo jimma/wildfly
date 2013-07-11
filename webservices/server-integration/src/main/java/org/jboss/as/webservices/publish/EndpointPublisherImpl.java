@@ -258,7 +258,7 @@ public final class EndpointPublisherImpl implements EndpointPublisher {
             // copy to replace the EndpointServiceDeploymentAspect
             List<DeploymentAspect> serverAspects = DeploymentAspectsProvider.getSortedDeploymentAspects();
             for (DeploymentAspect aspect : serverAspects) {
-                if ((aspect instanceof EndpointServiceDeploymentAspect)) {
+                if (aspect instanceof EndpointServiceDeploymentAspect) {
                     final EndpointServiceDeploymentAspect a = (EndpointServiceDeploymentAspect) aspect;
                     EndpointServiceDeploymentAspect clone = (EndpointServiceDeploymentAspect) (a.clone());
                     clone.setStopServices(true);

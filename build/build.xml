@@ -687,7 +687,7 @@
         </module-def>
 
         <module-def name="org.apache.santuario.xmlsec">
-            <maven-resource group="org.apache.santuario" artifact="xmlsec"/>
+            <maven-resource group="org.apache.santuario" artifact="xmlsec" filter="&lt;exclude path=&quot;javax/xml/**/*&quot;&gt;"/>
         </module-def>
 
         <module-def name="org.apache.velocity">

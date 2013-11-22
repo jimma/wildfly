@@ -81,7 +81,11 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.TRU
 import static org.jboss.as.security.Constants.CLASSIC;
 import static org.jboss.as.security.Constants.CODE;
 import static org.jboss.as.security.Constants.FLAG;
+import static org.jboss.as.security.Constants.AUTH_MODULE;
+import static org.jboss.as.security.Constants.JASPI;
 import static org.jboss.as.security.Constants.LOGIN_MODULE;
+import static org.jboss.as.security.Constants.LOGIN_MODULE_STACK;
+import static org.jboss.as.security.Constants.LOGIN_MODULE_STACK_REF;
 import static org.jboss.as.security.Constants.MODULE_OPTIONS;
 import static org.jboss.as.security.Constants.SECURITY_DOMAIN;
 
@@ -233,9 +237,7 @@ public final class RemoteDeployer implements Deployer {
             compositeOp.get(OPERATION_HEADERS, ALLOW_RESOURCE_SERVICE_RESTART).set(true);
 
             ModelNode steps = compositeOp.get(STEPS);
-            PathAddress address = PathAddress.pathAddress()
-                    .append(SUBSYSTEM, "security")
-                    .append(SECURITY_DOMAIN, name);
+            PathAddress address = PathAddress.pathAddress().append(SUBSYSTEM, "security").append(SECURITY_DOMAIN, name);
             steps.add(Util.createAddOperation(address));
             address = address.append(Constants.AUTHENTICATION, CLASSIC);
             steps.add(Util.createAddOperation(address));
@@ -250,6 +252,67 @@ public final class RemoteDeployer implements Deployer {
                 }
             }
             steps.add(loginModule);
+            updates.add(compositeOp);
+
+            applyUpdates(updates);
+        }
+    }
+
+    public void addJaspiSecurityDomain(String name, String loginModuleStackName, Map<String, String> loginModuleOptions,
+            String authModuleName, Map<String, String> authModuleOptions) throws Exception {
+        synchronized (securityDomainUsers) {
+            if (securityDomainUsers.containsKey(name)) {
+                int count = securityDomainUsers.get(name);
+                securityDomainUsers.put(name, (count + 1));
+                return;
+            } else {
+                securityDomainUsers.put(name, 1);
+            }
+
+            final List<ModelNode> updates = new ArrayList<ModelNode>();
+
+            final ModelNode compositeOp = new ModelNode();
+            compositeOp.get(OP).set(COMPOSITE);
+            compositeOp.get(OP_ADDR).setEmptyList();
+            compositeOp.get(OPERATION_HEADERS, ALLOW_RESOURCE_SERVICE_RESTART).set(true);
+
+            ModelNode steps = compositeOp.get(STEPS);
+            PathAddress address = PathAddress.pathAddress().append(SUBSYSTEM, "security").append(SECURITY_DOMAIN, name);
+            steps.add(Util.createAddOperation(address));
+
+            PathAddress parentAddress = address.append(AUTHENTICATION, JASPI);
+            steps.add(Util.createAddOperation(parentAddress));
+
+            // step 3
+            PathAddress loignStackAddress = parentAddress.append(LOGIN_MODULE_STACK, loginModuleStackName);
+            ModelNode loginStack = Util.createAddOperation(loignStackAddress);
+            steps.add(loginStack);
+
+            // step 4
+            ModelNode loginModule = Util.createAddOperation(loignStackAddress.append(LOGIN_MODULE, "UsersRoles"));
+            loginModule.get(CODE).set("UsersRoles");
+            loginModule.get(FLAG).set(REQUIRED);
+            loginModule.get(OPERATION_HEADERS).get(ALLOW_RESOURCE_SERVICE_RESTART).set(true);
+            final ModelNode moduleOptions = loginModule.get(MODULE_OPTIONS);
+            if (loginModuleOptions != null) {
+                for (final String k : loginModuleOptions.keySet()) {
+                    moduleOptions.add(k, loginModuleOptions.get(k));
+                }
+            }
+            steps.add(loginModule);
+
+            PathAddress authModule = parentAddress.append(AUTH_MODULE, authModuleName);
+            ModelNode authModuleNode = Util.createAddOperation(authModule);
+            authModuleNode.get(LOGIN_MODULE_STACK_REF).set(loginModuleStackName);
+            authModuleNode.get(CODE).set(authModuleName);
+            ModelNode options = authModuleNode.get(MODULE_OPTIONS);
+            if (authModuleOptions != null) {
+                for (final String k : authModuleOptions.keySet()) {
+                    options.add(k, authModuleOptions.get(k));
+                }
+            }
+            steps.add(authModuleNode);
+
             updates.add(compositeOp);
 
             applyUpdates(updates);
@@ -298,7 +361,8 @@ public final class RemoteDeployer implements Deployer {
             addSecurityRealm(JBWS_DEPLOYER_HTTPS_LISTENER_REALM_NAME, sslOptionsMap, truststoreOptionsMap);
             final ModelNode composite = Util.getEmptyOperation(COMPOSITE, new ModelNode());
             final ModelNode steps = composite.get(STEPS);
-            ModelNode op = createOpNode("subsystem=undertow/server=default-server/https-listener=" + JBWS_DEPLOYER_HTTPS_LISTENER_NAME, "add");
+            ModelNode op = createOpNode("subsystem=undertow/server=default-server/https-listener="
+                    + JBWS_DEPLOYER_HTTPS_LISTENER_NAME, "add");
             op.get("socket-binding").set("https");
             op.get("security-realm").set(JBWS_DEPLOYER_HTTPS_LISTENER_REALM_NAME);
             final String verifyClient = "verify-client";
@@ -313,7 +377,8 @@ public final class RemoteDeployer implements Deployer {
         }
     }
 
-    private static void addSecurityRealm(String realm, Map<String, String> sslOptions, Map<String, String> truststoreOptions) throws Exception {
+    private static void addSecurityRealm(String realm, Map<String, String> sslOptions, Map<String, String> truststoreOptions)
+            throws Exception {
         final ModelNode composite = Util.getEmptyOperation(COMPOSITE, new ModelNode());
         final ModelNode steps = composite.get(STEPS);
         ModelNode op = createOpNode("core-service=management/security-realm=" + realm, ADD);
@@ -327,7 +392,8 @@ public final class RemoteDeployer implements Deployer {
         }
 
         if (!truststoreOptions.isEmpty()) {
-            ModelNode truststore = createOpNode("core-service=management/security-realm=" + realm + "/authentication=truststore", ADD);
+            ModelNode truststore = createOpNode("core-service=management/security-realm=" + realm
+                    + "/authentication=truststore", ADD);
             for (final Entry<String, String> entry : truststoreOptions.entrySet()) {
                 truststore.get(entry.getKey()).set(entry.getValue());
             }
@@ -338,7 +404,8 @@ public final class RemoteDeployer implements Deployer {
 
     public void removeHttpsConnector() throws Exception {
         try {
-            ModelNode op = createOpNode("subsystem=undertow/server=default-server/https-listener=" + JBWS_DEPLOYER_HTTPS_LISTENER_NAME, REMOVE);
+            ModelNode op = createOpNode("subsystem=undertow/server=default-server/https-listener="
+                    + JBWS_DEPLOYER_HTTPS_LISTENER_NAME, REMOVE);
             op.get(OPERATION_HEADERS, ALLOW_RESOURCE_SERVICE_RESTART).set(true);
             applyUpdate(op);
             op = createOpNode("core-service=management/security-realm=" + JBWS_DEPLOYER_HTTPS_LISTENER_REALM_NAME, REMOVE);

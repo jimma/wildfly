@@ -1860,7 +1860,7 @@
 
                 <dependency>
                     <groupId>org.jboss.ws.projects</groupId>
-                    <artifactId>jaxws-jboss-httpserver-httpspi</artifactId>
+                    <artifactId>jaxws-undertow-httpspi</artifactId>
                 </dependency>
 
                 <dependency>
@@ -1886,7 +1886,7 @@
 
                 <dependency>
                     <groupId>org.jboss.ws.cxf</groupId>
-                    <artifactId>jbossws-cxf-transports-httpserver</artifactId>
+                    <artifactId>jbossws-cxf-transports-undertow</artifactId>
                 </dependency>
 
                 <dependency>

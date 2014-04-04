@@ -21,24 +21,34 @@
  */
 package org.jboss.as.webservices.dmr;
 
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP_ADDR;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SUBSYSTEM;
 import static org.jboss.as.webservices.dmr.Constants.CLIENT_CONFIG;
 import static org.jboss.as.webservices.dmr.Constants.ENDPOINT;
 import static org.jboss.as.webservices.dmr.Constants.ENDPOINT_CONFIG;
 import static org.jboss.as.webservices.dmr.Constants.HANDLER;
+import static org.jboss.as.webservices.dmr.Constants.MESSAGE_LOG;
 import static org.jboss.as.webservices.dmr.Constants.POST_HANDLER_CHAIN;
 import static org.jboss.as.webservices.dmr.Constants.PRE_HANDLER_CHAIN;
 import static org.jboss.as.webservices.dmr.Constants.PROPERTY;
 
-import org.jboss.as.controller.Extension;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+
+import org.jboss.as.controller.AbstractWriteAttributeHandler;
 import org.jboss.as.controller.AttributeDefinition;
+import org.jboss.as.controller.Extension;
 import org.jboss.as.controller.ExtensionContext;
 import org.jboss.as.controller.ModelVersion;
+import org.jboss.as.controller.OperationContext;
+import org.jboss.as.controller.OperationFailedException;
+import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.PathElement;
 import org.jboss.as.controller.ReloadRequiredRemoveStepHandler;
 import org.jboss.as.controller.ReloadRequiredWriteAttributeHandler;
 import org.jboss.as.controller.ResourceBuilder;
 import org.jboss.as.controller.ResourceDefinition;
+import org.jboss.as.controller.SimpleAttributeDefinition;
 import org.jboss.as.controller.SimpleAttributeDefinitionBuilder;
 import org.jboss.as.controller.SubsystemRegistration;
 import org.jboss.as.controller.descriptions.StandardResourceDescriptionResolver;
@@ -48,7 +58,12 @@ import org.jboss.as.controller.transform.description.RejectAttributeChecker;
 import org.jboss.as.controller.transform.description.ResourceTransformationDescriptionBuilder;
 import org.jboss.as.controller.transform.description.TransformationDescription;
 import org.jboss.as.controller.transform.description.TransformationDescriptionBuilder;
+import org.jboss.as.webservices.util.WSServices;
+import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ModelType;
+import org.jboss.msc.service.ServiceController;
+import org.jboss.msc.service.ServiceName;
+import org.jboss.wsf.spi.deployment.Endpoint;
 
 /**
  * The webservices extension.
@@ -66,6 +81,7 @@ public final class WSExtension implements Extension {
     private static final PathElement PROPERTY_PATH = PathElement.pathElement(PROPERTY);
     static final PathElement PRE_HANDLER_CHAIN_PATH = PathElement.pathElement(PRE_HANDLER_CHAIN);
     static final PathElement POST_HANDLER_CHAIN_PATH = PathElement.pathElement(POST_HANDLER_CHAIN);
+    static final PathElement MESSAGE_LOG_PATH = PathElement.pathElement(MESSAGE_LOG);
     static final PathElement HANDLER_PATH = PathElement.pathElement(HANDLER);
     public static final String SUBSYSTEM_NAME = "webservices";
     static final PathElement SUBSYSTEM_PATH = PathElement.pathElement(SUBSYSTEM, SUBSYSTEM_NAME);
@@ -96,7 +112,10 @@ public final class WSExtension implements Extension {
             Constants.ENDPOINT_NAME, ModelType.STRING, false)
             .setStorageRuntime()
             .build();
-
+    static final AttributeDefinition MESSAGE = new SimpleAttributeDefinitionBuilder(
+            Constants.MESSAGE_LOG, ModelType.BOOLEAN, false)
+            .setStorageRuntime()
+            .build();
 
     static StandardResourceDescriptionResolver getResourceDescriptionResolver(final String... keyPrefix) {
         StringBuilder prefix = new StringBuilder(SUBSYSTEM_NAME);
@@ -171,6 +190,7 @@ public final class WSExtension implements Extension {
                     .addReadOnlyAttribute(ENDPOINT_NAME)
                     .addReadOnlyAttribute(ENDPOINT_TYPE)
                     .addReadOnlyAttribute(ENDPOINT_WSDL)
+                    .addReadWriteAttribute(MESSAGE, null, new MessageLogEnableWriteAttributeHandler(Attributes.MESSAGE_LOG))
                     .build());
         }
 
@@ -200,4 +220,50 @@ public final class WSExtension implements Extension {
 
         TransformationDescription.Tools.register(builder.build(), registration, version);
     }
+
+   class MessageLogEnableWriteAttributeHandler extends AbstractWriteAttributeHandler<Void> {
+        public MessageLogEnableWriteAttributeHandler (SimpleAttributeDefinition attributeDef) {
+            super(attributeDef);
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        protected boolean applyUpdateToRuntime(OperationContext context, ModelNode operation, String attributeName,
+                                               ModelNode resolvedValue, ModelNode currentValue,
+                                               HandbackHolder<Void> handbackHolder) throws OperationFailedException {
+            final PathAddress address = PathAddress.pathAddress(operation.require(OP_ADDR));
+            String endpointId;
+            try {
+                endpointId = URLDecoder.decode(address.getLastElement().getValue(), "UTF-8");
+            } catch (final UnsupportedEncodingException e) {
+                throw new RuntimeException(e);
+            }
+            final String webContext = endpointId.substring(0, endpointId.indexOf(":"));
+            final String endpointName = endpointId.substring(endpointId.indexOf(":") + 1);
+            ServiceName endpointServiceName = WSServices.ENDPOINT_SERVICE.append("context="+webContext).append(endpointName);
+            ServiceController<Endpoint> service = (ServiceController<Endpoint>)context.getServiceRegistry(false).getService(endpointServiceName);
+            Endpoint endpoint= service.getValue();
+            endpoint.setMsgLog(resolvedValue.asBoolean());
+            return false;
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        protected void revertUpdateToRuntime(OperationContext context, ModelNode operation, String attributeName, ModelNode valueToRestore, ModelNode valueToRevert, Void handback) throws OperationFailedException {
+            final PathAddress address = PathAddress.pathAddress(operation.require(OP_ADDR));
+            String endpointId;
+            try {
+                endpointId = URLDecoder.decode(address.getLastElement().getValue(), "UTF-8");
+            } catch (final UnsupportedEncodingException e) {
+                throw new RuntimeException(e);
+            }
+            final String webContext = endpointId.substring(0, endpointId.indexOf(":"));
+            final String endpointName = endpointId.substring(endpointId.indexOf(":") + 1);
+            ServiceName endpointServiceName = WSServices.ENDPOINT_SERVICE.append("context="+webContext).append(endpointName);
+            ServiceController<Endpoint> service = (ServiceController<Endpoint>)context.getServiceRegistry(false).getService(endpointServiceName);
+            Endpoint endpoint = service.getValue();
+            endpoint.setMsgLog(valueToRestore.asBoolean());
+        }
+    }
+
 }

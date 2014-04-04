@@ -56,6 +56,12 @@ interface Attributes {
             .setAllowExpression(true)
             .build();
 
+    SimpleAttributeDefinition MESSAGE_LOG = new SimpleAttributeDefinitionBuilder(Constants.MESSAGE_LOG, ModelType.BOOLEAN)
+            .setAllowNull(true)
+            .setDefaultValue(new ModelNode(true))
+            .setAllowExpression(true)
+            .build();
+
     SimpleAttributeDefinition MODIFY_WSDL_ADDRESS = new SimpleAttributeDefinitionBuilder(Constants.MODIFY_WSDL_ADDRESS, ModelType.BOOLEAN)
             .setAllowNull(true)
             .setDefaultValue(new ModelNode(true))
@@ -76,6 +82,4 @@ interface Attributes {
             .setAllowNull(true)
             .setAllowExpression(true)
             .build();
-
-
 }

@@ -28,6 +28,7 @@ import static org.jboss.as.webservices.dmr.Constants.ENDPOINT_CONTEXT;
 import static org.jboss.as.webservices.dmr.Constants.ENDPOINT_NAME;
 import static org.jboss.as.webservices.dmr.Constants.ENDPOINT_TYPE;
 import static org.jboss.as.webservices.dmr.Constants.ENDPOINT_WSDL;
+import static org.jboss.as.webservices.dmr.Constants.MESSAGE_LOG;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -70,6 +71,7 @@ public final class ModelDeploymentAspect extends AbstractDeploymentAspect {
             op.get(ENDPOINT_CLASS).set(endpoint.getTargetBeanName());
             op.get(ENDPOINT_TYPE).set(endpoint.getType().toString());
             op.get(ENDPOINT_WSDL).set(endpoint.getAddress() + "?wsdl");
+            op.get(MESSAGE_LOG).set(false);
         }
     }
 

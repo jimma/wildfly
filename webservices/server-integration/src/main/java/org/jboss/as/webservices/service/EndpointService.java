@@ -63,6 +63,7 @@ import org.jboss.ws.common.management.AbstractServerConfig;
 import org.jboss.ws.common.management.ManagedEndpoint;
 import org.jboss.ws.common.monitoring.ManagedRecordProcessor;
 import org.jboss.wsf.spi.SPIProvider;
+import org.jboss.wsf.spi.classloading.ClassLoaderProvider;
 import org.jboss.wsf.spi.deployment.Deployment;
 import org.jboss.wsf.spi.deployment.Endpoint;
 import org.jboss.wsf.spi.deployment.EndpointType;
@@ -114,8 +115,9 @@ public final class EndpointService implements Service<Endpoint> {
         for (final RecordProcessor processor : processors) {
             registerRecordProcessor(processor, endpoint);
         }
-        final EndpointMetricsFactory factory = SPIProvider.getInstance().getSPI(EndpointMetricsFactory.class);
-        endpoint.setEndpointMetrics(factory.newEndpointMetrics());
+        final EndpointMetricsFactory factory = SPIProvider.getInstance().getSPI(EndpointMetricsFactory.class,
+                ClassLoaderProvider.getDefaultProvider().getServerIntegrationClassLoader());
+        endpoint.setEndpointMetrics(factory.newEndpointMetrics(endpoint));
         registerEndpoint(endpoint);
         endpoint.getLifecycleHandler().start(endpoint);
     }

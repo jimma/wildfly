@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2014, Red Hat Middleware LLC, and individual contributors
+ * Copyright 2015, Red Hat Middleware LLC, and individual contributors
  * as indicated by the @author tags. See the copyright.txt file in the
  * distribution for a full listing of individual contributors.
  *
@@ -21,6 +21,7 @@
  */
 package org.jboss.as.webservices.tomcat;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -30,12 +31,23 @@ import org.jboss.as.webservices.util.ASHelper;
 import org.jboss.as.webservices.util.WebMetaDataHelper;
 import org.jboss.metadata.javaee.spec.ParamValueMetaData;
 import org.jboss.metadata.web.jboss.JBossWebMetaData;
+import org.jboss.metadata.web.spec.AuthConstraintMetaData;
+import org.jboss.metadata.web.spec.FilterMappingMetaData;
+import org.jboss.metadata.web.spec.FilterMetaData;
+import org.jboss.metadata.web.spec.FiltersMetaData;
+import org.jboss.metadata.web.spec.LoginConfigMetaData;
+import org.jboss.metadata.web.spec.SecurityConstraintMetaData;
 import org.jboss.metadata.web.spec.ServletMetaData;
+import org.jboss.metadata.web.spec.WebResourceCollectionMetaData;
+import org.jboss.metadata.web.spec.WebResourceCollectionsMetaData;
+import org.jboss.security.SecurityConstants;
 import org.jboss.ws.common.integration.WSConstants;
 import org.jboss.ws.common.integration.WSHelper;
 import org.jboss.wsf.spi.deployment.Deployment;
 import org.jboss.wsf.spi.deployment.Endpoint;
+import org.jboss.wsf.spi.deployment.HttpEndpoint;
 import org.jboss.wsf.spi.deployment.WSFServlet;
+import org.jboss.wsf.spi.deployment.ManagementFilter;
 
 /**
  * The modifier of jboss web meta data. It configures WS transport for every webservice endpoint plus propagates WS stack
@@ -44,9 +56,14 @@ import org.jboss.wsf.spi.deployment.WSFServlet;
  * @author <a href="mailto:ropalka@redhat.com">Richard Opalka</a>
  * @author <a href="mailto:tdiesler@redhat.com">Thomas Diesler</a>
  * @author <a href="mailto:alessio.soldano@jboss.com">Alessio Soldano</a>
+ * @author <a href="mailto:ema@redhat.com">Jim Ma</a>
  */
 final class WebMetaDataModifier {
-
+    private final String MANAGEMENT_URL_PATTERN = "management/*";
+    private final String MANAGEMENT_ROLE = "admin";
+    private final String MANAGEMENT_RESOURCE_NAME = "EndpointManagement";
+    private final String MANAGEMENT_REALM = "ManagementRealm";
+    private final String MANAGEMENT_AUTH_METHOD = "BASIC";
     WebMetaDataModifier() {
         super();
     }
@@ -60,8 +77,95 @@ final class WebMetaDataModifier {
         final JBossWebMetaData jbossWebMD = WSHelper.getOptionalAttachment(dep, JBossWebMetaData.class);
 
         if (jbossWebMD != null) {
+            this.configureFilter(dep, jbossWebMD);
             this.configureEndpoints(dep, jbossWebMD);
             this.modifyContextRoot(dep, jbossWebMD);
+        }
+    }
+
+    private void configureFilter(final Deployment dep, final JBossWebMetaData jbossWebMD) {
+        //Add filter and filter mapping for management urls
+        FiltersMetaData filtersData = jbossWebMD.getFilters();
+        if (filtersData == null) {
+            filtersData = new FiltersMetaData();
+        }
+        List<FilterMappingMetaData> filterMappingList = jbossWebMD.getFilterMappings();
+        if (filterMappingList == null) {
+            filterMappingList = new ArrayList<FilterMappingMetaData>();
+        }
+        List<String> filterUrlPatterns = new ArrayList<String>();
+        for (Endpoint endpoint : dep.getService().getEndpoints()) {
+            if (endpoint instanceof HttpEndpoint) {
+                HttpEndpoint httpEndpoint = (HttpEndpoint) endpoint;
+                String pattern = httpEndpoint.getURLPattern();
+                FilterMetaData filterMD = new FilterMetaData();
+                filterMD.setFilterName(endpoint.getShortName());
+                filterMD.setFilterClass(ManagementFilter.class.getName());
+                ParamValueMetaData paramValueMD = new ParamValueMetaData();
+                paramValueMD.setParamName("httpURLPattern");
+                paramValueMD.setParamValue(pattern.toString());
+                List<ParamValueMetaData> paramList = new ArrayList<ParamValueMetaData>();
+                paramList.add(paramValueMD);
+                filterMD.setInitParam(paramList);
+                filtersData.add(filterMD);
+
+                FilterMappingMetaData filterMappingData = new FilterMappingMetaData();
+                filterMappingData.setFilterName(endpoint.getShortName());
+                String managementURL = pattern + "/ " + MANAGEMENT_URL_PATTERN;
+                if (pattern.endsWith("/*")) {
+                    managementURL = pattern.substring(0, pattern.length()-2) + "/" + MANAGEMENT_URL_PATTERN;
+                }
+                if (pattern.endsWith("/")) {
+                    managementURL = pattern + MANAGEMENT_URL_PATTERN;
+                }
+                filterUrlPatterns.add(managementURL);
+                filterMappingData.setUrlPatterns(filterUrlPatterns);
+                filterMappingList.add(filterMappingData);
+            }
+        }
+        jbossWebMD.setFilters(filtersData);
+        jbossWebMD.setFilterMappings(filterMappingList);
+        //Add SecurityConstraintMetaData for management url if not exists.
+        SecurityConstraintMetaData securityConstraintMD = new SecurityConstraintMetaData();
+        AuthConstraintMetaData authConstaintMD = new AuthConstraintMetaData();
+        List<String> roles = new ArrayList<String>();
+        roles.add(MANAGEMENT_ROLE);
+        authConstaintMD.setRoleNames(roles);
+        securityConstraintMD.setAuthConstraint(authConstaintMD);
+        WebResourceCollectionsMetaData webResources = new WebResourceCollectionsMetaData();
+        WebResourceCollectionMetaData webResource = new WebResourceCollectionMetaData();
+        webResource.setWebResourceName(MANAGEMENT_RESOURCE_NAME);
+        webResource.setUrlPatterns(filterUrlPatterns);
+        webResources.add(webResource);
+        securityConstraintMD.setResourceCollections(webResources);
+        if (jbossWebMD.getSecurityConstraints() == null) {
+            List<SecurityConstraintMetaData> securityConstraintsList = new ArrayList<SecurityConstraintMetaData>();
+            securityConstraintsList.add(securityConstraintMD);
+            jbossWebMD.setSecurityConstraints(securityConstraintsList);
+        } else {
+            boolean endpointManagementExists = false;
+            for (SecurityConstraintMetaData item : jbossWebMD.getSecurityConstraints()) {
+                 for (WebResourceCollectionMetaData resourceCollectionMD : item.getResourceCollections()) {
+                      if (MANAGEMENT_RESOURCE_NAME.endsWith(resourceCollectionMD.getWebResourceName())) {
+                          endpointManagementExists = true;
+                          break;
+                      }
+                 }
+            }
+            if (!endpointManagementExists) {
+                jbossWebMD.getSecurityConstraints().add(securityConstraintMD);
+            }
+        }
+        //Add default login config for management resource
+        if (jbossWebMD.getLoginConfig() == null) {
+            LoginConfigMetaData login = new LoginConfigMetaData();
+            login.setRealmName(MANAGEMENT_REALM);
+            login.setAuthMethod(MANAGEMENT_AUTH_METHOD);
+            jbossWebMD.setLoginConfig(login);
+        }
+        //Add default security domain if not exists
+        if (jbossWebMD.getSecurityDomain() == null) {
+            jbossWebMD.setSecurityDomain(SecurityConstants.DEFAULT_APPLICATION_POLICY);
         }
     }
 

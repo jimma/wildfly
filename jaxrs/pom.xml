@@ -96,30 +96,30 @@
             <artifactId>jboss-msc</artifactId>
         </dependency>
 
-        <dependency>
+        <!--dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-cdi</artifactId>
-        </dependency>
+        </dependency-->
 
         <dependency>
             <groupId>org.jboss.spec.javax.ws.rs</groupId>
             <artifactId>jboss-jaxrs-api_2.0_spec</artifactId>
         </dependency>
 
-        <dependency>
+        <!--dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-crypto</artifactId>
-        </dependency>
+        </dependency-->
 
         <dependency>
-            <groupId>org.jboss.resteasy</groupId>
-            <artifactId>resteasy-jaxrs</artifactId>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-frontend-jaxrs</artifactId>
         </dependency>
 
-        <dependency>
+        <!--dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>async-http-servlet-3.0</artifactId>
-        </dependency>
+        </dependency-->
 
         <dependency>
             <groupId>org.jboss.spec.javax.annotation</groupId>

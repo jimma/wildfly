@@ -35,7 +35,6 @@ import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.as.server.deployment.DeploymentUnitProcessor;
 import org.jboss.modules.Module;
-import org.jboss.resteasy.util.GetRestful;
 
 import static org.jboss.as.jaxrs.logging.JaxrsLogger.JAXRS_LOGGER;
 
@@ -67,7 +66,7 @@ public class JaxrsComponentDeployer implements DeploymentUnitProcessor {
         }
 
 
-        final ResteasyDeploymentData resteasy = deploymentUnit.getAttachment(JaxrsAttachments.RESTEASY_DEPLOYMENT_DATA);
+        final JAXRSDeploymentData resteasy = deploymentUnit.getAttachment(JaxrsAttachments.RESTEASY_DEPLOYMENT_DATA);
         if (resteasy == null) {
             return;
         }
@@ -88,8 +87,9 @@ public class JaxrsComponentDeployer implements DeploymentUnitProcessor {
             } catch (ClassNotFoundException e) {
                 throw new DeploymentUnitProcessingException(e);
             }
-            if (!GetRestful.isRootResource(componentClass)) continue;
-
+            //TODO:check this 
+            //if (!GetRestful.isRootResource(componentClass)) continue;
+            continue;
             if (isInstanceOf(component, SESSION_BEAN_DESCRIPTION_CLASS_NAME)) {
                 if (isInstanceOf(component, STATEFUL_SESSION_BEAN_DESCRIPTION_CLASS_NAME)) {
                     //using SFSB's as JAX-RS endpoints is not recommended, but if people really want to do it they can

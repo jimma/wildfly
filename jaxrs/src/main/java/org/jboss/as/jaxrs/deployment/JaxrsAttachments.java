@@ -34,7 +34,7 @@ import java.util.Map;
  */
 public class JaxrsAttachments {
 
-    public static final AttachmentKey<ResteasyDeploymentData> RESTEASY_DEPLOYMENT_DATA = AttachmentKey.create(ResteasyDeploymentData.class);
-    public static final AttachmentKey<Map<ModuleIdentifier, ResteasyDeploymentData>> ADDITIONAL_RESTEASY_DEPLOYMENT_DATA = AttachmentKey.create(Map.class);
+    public static final AttachmentKey<JAXRSDeploymentData> JAXRS_DEPLOYMENT_DATA = AttachmentKey.create(JAXRSDeploymentData.class);
+    public static final AttachmentKey<Map<ModuleIdentifier, JAXRSDeploymentData>> ADDITIONAL_JAXRS_DEPLOYMENT_DATA = AttachmentKey.create(Map.class);
 
 }

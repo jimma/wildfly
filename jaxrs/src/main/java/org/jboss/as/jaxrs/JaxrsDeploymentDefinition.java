@@ -24,14 +24,18 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SUB
 import static org.wildfly.extension.undertow.DeploymentDefinition.CONTEXT_ROOT;
 import static org.wildfly.extension.undertow.DeploymentDefinition.SERVER;
 import static org.wildfly.extension.undertow.DeploymentDefinition.VIRTUAL_HOST;
-
 import io.undertow.servlet.api.ThreadSetupAction.Handle;
 import io.undertow.servlet.handlers.ServletHandler;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
+
+import org.apache.cxf.jaxrs.model.OperationResourceInfo;
+import org.apache.cxf.jaxrs.servlet.CXFNonSpringJaxrsServlet;
 import org.jboss.as.controller.AttributeDefinition;
 import org.jboss.as.controller.ObjectTypeAttributeDefinition;
 import org.jboss.as.controller.OperationContext;
@@ -49,10 +53,6 @@ import org.jboss.as.controller.registry.ManagementResourceRegistration;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ModelType;
 import org.jboss.msc.service.ServiceController;
-import org.jboss.resteasy.core.ResourceInvoker;
-import org.jboss.resteasy.core.ResourceMethodInvoker;
-import org.jboss.resteasy.core.ResourceMethodRegistry;
-import org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher;
 import org.wildfly.extension.undertow.UndertowExtension;
 import org.wildfly.extension.undertow.UndertowService;
 import org.wildfly.extension.undertow.deployment.UndertowDeploymentService;
@@ -102,8 +102,8 @@ public class JaxrsDeploymentDefinition extends SimpleResourceDefinition {
                 .setReplyParameters(JAXRS_RESOURCE).build();
 
 
-        void handle(ModelNode response, String contextRootPath, Collection<String> servletMappings, String mapping, List<ResourceInvoker> resources) {
-            for (ResourceInvoker resourceInvoker : resources) {
+        void handle(ModelNode response, String contextRootPath, Collection<String> servletMappings, String mapping, List<OperationResourceInfo> resources) {
+            /*for (ResourceInvoker resourceInvoker : resources) {
                 ResourceMethodInvoker resource = (ResourceMethodInvoker) resourceInvoker;
                 final ModelNode node = new ModelNode();
                 node.get(CLASSNAME.getName()).set(resource.getResourceClass().getCanonicalName());
@@ -115,15 +115,16 @@ public class JaxrsDeploymentDefinition extends SimpleResourceDefinition {
                     }
                 }
                 response.add(node);
-            }
+            }*/
         }
 
-        private String formatMethod(ResourceMethodInvoker resource, String servletMapping, String path, String contextRootPath) {
-            StringBuilder builder = new StringBuilder();
+        private String formatMethod(OperationResourceInfo operationInfo, String servletMapping, String path, String contextRootPath) {
+            
+        	StringBuilder builder = new StringBuilder();
             builder.append("%1$s ");
             builder.append(contextRootPath).append('/').append(servletMapping.replaceAll("\\*", "")).append(path);
-            builder.append(" - ").append(resource.getResourceClass().getCanonicalName()).append('.').append(resource.getMethod().getName()).append('(');
-            if (resource.getMethod().getParameterTypes().length > 0) {
+            builder.append(" - ").append(operationInfo.getClassResourceInfo().getResourceClass().getCanonicalName()).append('.').append(operationInfo.getHttpMethod()).append('(');
+            if (operationInfo.getInGenericParameterTypes().length > 0) {
                 builder.append("...");
             }
             builder.append(')');
@@ -142,28 +143,30 @@ public class JaxrsDeploymentDefinition extends SimpleResourceDefinition {
 
             final ServiceController<?> controller = context.getServiceRegistry(false).getService(UndertowService.deploymentServiceName(server, host, contextPath));
             final UndertowDeploymentService deploymentService = (UndertowDeploymentService) controller.getService();
-            Servlet resteasyServlet = null;
+            Servlet jaxrsServlet = null;
             Handle handle = deploymentService.getDeployment().getThreadSetupAction().setup(null);
             try {
                 for (Map.Entry<String, ServletHandler> servletHandler : deploymentService.getDeployment().getServlets().getServletHandlers().entrySet()) {
-                    if (HttpServletDispatcher.class.isAssignableFrom(servletHandler.getValue().getManagedServlet().getServletInfo().getServletClass())) {
-                        resteasyServlet = (Servlet) servletHandler.getValue().getManagedServlet().getServlet().getInstance();
+                    if (CXFNonSpringJaxrsServlet.class.isAssignableFrom(servletHandler.getValue().getManagedServlet().getServletInfo().getServletClass())) {
+                    	jaxrsServlet = (Servlet) servletHandler.getValue().getManagedServlet().getServlet().getInstance();
                         break;
                     }
                 }
-                if (resteasyServlet != null) {
-                    final Collection<String> servletMappings = resteasyServlet.getServletConfig().getServletContext().getServletRegistration(resteasyServlet.getServletConfig().getServletName()).getMappings();
-                    final ResourceMethodRegistry registry = (ResourceMethodRegistry) ((HttpServletDispatcher) resteasyServlet).getDispatcher().getRegistry();
+                if (jaxrsServlet != null) {
+                    final Collection<String> servletMappings = jaxrsServlet.getServletConfig().getServletContext().getServletRegistration(jaxrsServlet.getServletConfig().getServletName()).getMappings();
+                    
+                    //TODO: Add a jbossws JBossJAXRSServlet to expose JAXServerFactoryBean                  
+                    //final ResourceMethodRegistry registry = (ResourceMethodRegistry) ((CXFNonSpringJaxrsServlet) jaxrsServlet).getDispatcher().getRegistry();
                     context.addStep(new OperationStepHandler() {
                         @Override
                         public void execute(final OperationContext context, final ModelNode operation) throws OperationFailedException {
-                            if (registry != null) {
+                            /*if (registry != null) {
                                 final ModelNode response = new ModelNode();
                                 for (Map.Entry<String, List<ResourceInvoker>> resource : registry.getBounded().entrySet()) {
                                     handle(response, contextPath, servletMappings, resource.getKey(), resource.getValue());
                                 }
                                 context.getResult().set(response);
-                            }
+                            }*/
                         }
                     }, OperationContext.Stage.RUNTIME);
                 }

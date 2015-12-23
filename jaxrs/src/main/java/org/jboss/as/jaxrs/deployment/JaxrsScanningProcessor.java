@@ -53,14 +53,14 @@ import org.jboss.metadata.web.spec.ServletMetaData;
 import org.jboss.modules.Module;
 import org.jboss.modules.ModuleIdentifier;
 import org.jboss.modules.ModuleLoadException;
-import org.jboss.resteasy.plugins.server.servlet.HttpServlet30Dispatcher;
+/*import org.jboss.resteasy.plugins.server.servlet.HttpServlet30Dispatcher;
 import org.jboss.resteasy.plugins.server.servlet.ResteasyBootstrapClasses;
-import org.jboss.resteasy.plugins.server.servlet.ResteasyContextParameters;
+import org.jboss.resteasy.plugins.server.servlet.ResteasyContextParameters;*/
 
 import static org.jboss.as.jaxrs.logging.JaxrsLogger.JAXRS_LOGGER;
-import static org.jboss.resteasy.plugins.server.servlet.ResteasyContextParameters.RESTEASY_SCAN;
+/*import static org.jboss.resteasy.plugins.server.servlet.ResteasyContextParameters.RESTEASY_SCAN;
 import static org.jboss.resteasy.plugins.server.servlet.ResteasyContextParameters.RESTEASY_SCAN_PROVIDERS;
-import static org.jboss.resteasy.plugins.server.servlet.ResteasyContextParameters.RESTEASY_SCAN_RESOURCES;
+import static org.jboss.resteasy.plugins.server.servlet.ResteasyContextParameters.RESTEASY_SCAN_RESOURCES;*/
 
 /**
  * Processor that finds jax-rs classes in the deployment
@@ -80,31 +80,31 @@ public class JaxrsScanningProcessor implements DeploymentUnitProcessor {
             return;
         }
         final DeploymentUnit parent = deploymentUnit.getParent() == null ? deploymentUnit : deploymentUnit.getParent();
-        final Map<ModuleIdentifier, ResteasyDeploymentData> deploymentData;
+        final Map<ModuleIdentifier, JAXRSDeploymentData> deploymentData;
         if (deploymentUnit.getParent() == null) {
-            deploymentData = Collections.synchronizedMap(new HashMap<ModuleIdentifier, ResteasyDeploymentData>());
-            deploymentUnit.putAttachment(JaxrsAttachments.ADDITIONAL_RESTEASY_DEPLOYMENT_DATA, deploymentData);
+            deploymentData = Collections.synchronizedMap(new HashMap<ModuleIdentifier, JAXRSDeploymentData>());
+            deploymentUnit.putAttachment(JaxrsAttachments.ADDITIONAL_JAXRS_DEPLOYMENT_DATA, deploymentData);
         } else {
-            deploymentData = parent.getAttachment(JaxrsAttachments.ADDITIONAL_RESTEASY_DEPLOYMENT_DATA);
+            deploymentData = parent.getAttachment(JaxrsAttachments.ADDITIONAL_JAXRS_DEPLOYMENT_DATA);
         }
 
         final ModuleIdentifier moduleIdentifier = deploymentUnit.getAttachment(Attachments.MODULE_IDENTIFIER);
 
-        ResteasyDeploymentData resteasyDeploymentData = new ResteasyDeploymentData();
+        JAXRSDeploymentData jaxrsDeploymentData = new JAXRSDeploymentData();
         final WarMetaData warMetaData = deploymentUnit.getAttachment(WarMetaData.ATTACHMENT_KEY);
         final Module module = deploymentUnit.getAttachment(Attachments.MODULE);
 
         try {
 
             if (warMetaData == null) {
-                resteasyDeploymentData.setScanAll(true);
-                scan(deploymentUnit, module.getClassLoader(), resteasyDeploymentData);
-                deploymentData.put(moduleIdentifier, resteasyDeploymentData);
+            	jaxrsDeploymentData.setScanAll(true);
+                scan(deploymentUnit, module.getClassLoader(), jaxrsDeploymentData);
+                deploymentData.put(moduleIdentifier, jaxrsDeploymentData);
             } else {
-                scanWebDeployment(deploymentUnit, warMetaData.getMergedJBossWebMetaData(), module.getClassLoader(), resteasyDeploymentData);
-                scan(deploymentUnit, module.getClassLoader(), resteasyDeploymentData);
+                scanWebDeployment(deploymentUnit, warMetaData.getMergedJBossWebMetaData(), module.getClassLoader(), jaxrsDeploymentData);
+                scan(deploymentUnit, module.getClassLoader(), jaxrsDeploymentData);
             }
-            deploymentUnit.putAttachment(JaxrsAttachments.RESTEASY_DEPLOYMENT_DATA, resteasyDeploymentData);
+            deploymentUnit.putAttachment(JaxrsAttachments.JAXRS_DEPLOYMENT_DATA, jaxrsDeploymentData);
         } catch (ModuleLoadException e) {
             throw new DeploymentUnitProcessingException(e);
         }
@@ -118,7 +118,7 @@ public class JaxrsScanningProcessor implements DeploymentUnitProcessor {
     public static final Set<String> BOOT_CLASSES = new HashSet<String>();
 
     static {
-        Collections.addAll(BOOT_CLASSES, ResteasyBootstrapClasses.BOOTSTRAP_CLASSES);
+        //Collections.addAll(BOOT_CLASSES, ResteasyBootstrapClasses.BOOTSTRAP_CLASSES);
     }
 
     /**
@@ -142,7 +142,7 @@ public class JaxrsScanningProcessor implements DeploymentUnitProcessor {
 
     }
 
-    protected void scanWebDeployment(final DeploymentUnit du, final JBossWebMetaData webdata, final ClassLoader classLoader, final ResteasyDeploymentData resteasyDeploymentData) throws DeploymentUnitProcessingException {
+    protected void scanWebDeployment(final DeploymentUnit du, final JBossWebMetaData webdata, final ClassLoader classLoader, final JAXRSDeploymentData resteasyDeploymentData) throws DeploymentUnitProcessingException {
 
 
         // If there is a resteasy boot class in web.xml, then the default should be to not scan
@@ -169,7 +169,7 @@ public class JaxrsScanningProcessor implements DeploymentUnitProcessor {
 
         if (contextParams != null) {
             for (ParamValueMetaData param : contextParams) {
-                if (param.getParamName().equals(RESTEASY_SCAN)) {
+                /*if (param.getParamName().equals(RESTEASY_SCAN)) {
                     resteasyDeploymentData.setScanAll(valueOf(RESTEASY_SCAN, param.getParamValue()));
                 } else if (param.getParamName().equals(ResteasyContextParameters.RESTEASY_SCAN_PROVIDERS)) {
                     resteasyDeploymentData.setScanProviders(valueOf(RESTEASY_SCAN_PROVIDERS, param.getParamValue()));
@@ -177,13 +177,13 @@ public class JaxrsScanningProcessor implements DeploymentUnitProcessor {
                     resteasyDeploymentData.setScanResources(valueOf(RESTEASY_SCAN_RESOURCES, param.getParamValue()));
                 } else if (param.getParamName().equals(ResteasyContextParameters.RESTEASY_UNWRAPPED_EXCEPTIONS)) {
                     resteasyDeploymentData.setUnwrappedExceptionsParameterSet(true);
-                }
+                }*/
             }
         }
 
     }
 
-    protected void scan(final DeploymentUnit du, final ClassLoader classLoader, final ResteasyDeploymentData resteasyDeploymentData)
+    protected void scan(final DeploymentUnit du, final ClassLoader classLoader, final JAXRSDeploymentData resteasyDeploymentData)
             throws DeploymentUnitProcessingException, ModuleLoadException {
 
         final CompositeIndex index = du.getAttachment(Attachments.COMPOSITE_ANNOTATION_INDEX);

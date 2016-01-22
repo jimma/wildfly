@@ -74,14 +74,14 @@
                 template="configuration/standalone/template.xml"
                 subsystems="configuration/examples/subsystems-jts.xml"
                 output-file="docs/examples/configs/standalone-jts.xml"/>
-        <standalone
+        <!--standalone
                 template="configuration/standalone/template.xml"
                 subsystems="configuration/examples/subsystems-xts.xml"
                 output-file="docs/examples/configs/standalone-xts.xml"/>
         <standalone
                 template="configuration/standalone/template.xml"
                 subsystems="configuration/examples/subsystems-rts.xml"
-                output-file="docs/examples/configs/standalone-rts.xml"/>
+                output-file="docs/examples/configs/standalone-rts.xml"/-->
         <standalone
                 template="configuration/standalone/template.xml"
                 subsystems="configuration/examples/subsystems-genericjms.xml"
@@ -109,7 +109,7 @@
 
     </config>
     <copy-artifacts>
-        <copy-artifact artifact="org.jboss.resteasy:resteasy-spring" to-location="modules/system/layers/base/org/jboss/resteasy/resteasy-spring/main/bundled/resteasy-spring-jar/"/>
+        <!--copy-artifact artifact="org.jboss.resteasy:resteasy-spring" to-location="modules/system/layers/base/org/jboss/resteasy/resteasy-spring/main/bundled/resteasy-spring-jar/"/-->
         <copy-artifact artifact="org.jboss.seam.integration:jboss-seam-int-jbossas" to-location="modules/system/layers/base/org/jboss/integration/ext-content/main/bundled/jboss-seam-int.jar"/>
         <copy-artifact artifact="org.wildfly:wildfly-client-all" to-location="bin/client/jboss-client.jar"/>
         <copy-artifact artifact="org.wildfly.core:wildfly-cli::client" to-location="bin/client/jboss-cli-client.jar"/>

@@ -722,8 +722,20 @@
             <groupId>org.apache.cxf.xjcplugins</groupId>
             <artifactId>cxf-xjc-ts</artifactId>
         </dependency>
-
+        <!--new added cxf jaxrs-->
         <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-frontend-jaxrs</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-rs-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-rs-extension-providers</artifactId>
+        </dependency>         
+        <!--dependency>
             <groupId>org.wildfly</groupId>
             <artifactId>wildfly-rts</artifactId>
             <exclusions>
@@ -732,7 +744,7 @@
                     <artifactId>*</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
+        </dependency-->
 
         <dependency>
             <groupId>org.jboss.narayana.rts</groupId>
@@ -1030,7 +1042,7 @@
             <artifactId>jboss-jaxrs-api_2.0_spec</artifactId>
         </dependency>
 
-        <dependency>
+        <!--dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>jose-jwt</artifactId>
         </dependency>
@@ -1131,7 +1143,7 @@
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-yaml-provider</artifactId>
-        </dependency>
+        </dependency-->
 
         <dependency>
             <groupId>org.jboss.seam.integration</groupId>
@@ -2709,7 +2721,7 @@
             </exclusions>
         </dependency>
 
-        <dependency>
+        <!--dependency>
             <groupId>org.wildfly</groupId>
             <artifactId>wildfly-xts</artifactId>
             <exclusions>
@@ -2718,7 +2730,7 @@
                     <artifactId>*</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
+        </dependency-->
 
         <dependency>
             <groupId>org.jboss.ws.cxf</groupId>

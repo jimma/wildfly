@@ -117,10 +117,9 @@ public class JaxrsDeploymentDefinition extends SimpleResourceDefinition {
                 response.add(node);
             }*/
         }
-
+        /*
         private String formatMethod(OperationResourceInfo operationInfo, String servletMapping, String path, String contextRootPath) {
-            
-        	StringBuilder builder = new StringBuilder();
+            StringBuilder builder = new StringBuilder();
             builder.append("%1$s ");
             builder.append(contextRootPath).append('/').append(servletMapping.replaceAll("\\*", "")).append(path);
             builder.append(" - ").append(operationInfo.getClassResourceInfo().getResourceClass().getCanonicalName()).append('.').append(operationInfo.getHttpMethod()).append('(');
@@ -129,7 +128,7 @@ public class JaxrsDeploymentDefinition extends SimpleResourceDefinition {
             }
             builder.append(')');
             return builder.toString().replaceAll("//", "/");
-        }
+        }*/
 
         @Override
         public void execute(final OperationContext context, final ModelNode operation) throws OperationFailedException {
@@ -148,14 +147,13 @@ public class JaxrsDeploymentDefinition extends SimpleResourceDefinition {
             try {
                 for (Map.Entry<String, ServletHandler> servletHandler : deploymentService.getDeployment().getServlets().getServletHandlers().entrySet()) {
                     if (CXFNonSpringJaxrsServlet.class.isAssignableFrom(servletHandler.getValue().getManagedServlet().getServletInfo().getServletClass())) {
-                    	jaxrsServlet = (Servlet) servletHandler.getValue().getManagedServlet().getServlet().getInstance();
+                        jaxrsServlet = (Servlet) servletHandler.getValue().getManagedServlet().getServlet().getInstance();
                         break;
                     }
                 }
                 if (jaxrsServlet != null) {
                     final Collection<String> servletMappings = jaxrsServlet.getServletConfig().getServletContext().getServletRegistration(jaxrsServlet.getServletConfig().getServletName()).getMappings();
-                    
-                    //TODO: Add a jbossws JBossJAXRSServlet to expose JAXServerFactoryBean                  
+                    //TODO: Add a jbossws JBossJAXRSServlet to expose JAXServerFactoryBean
                     //final ResourceMethodRegistry registry = (ResourceMethodRegistry) ((CXFNonSpringJaxrsServlet) jaxrsServlet).getDispatcher().getRegistry();
                     context.addStep(new OperationStepHandler() {
                         @Override

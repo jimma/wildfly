@@ -293,7 +293,7 @@
         <module>security-manager</module>
         <module>system-jmx</module>
         <module>spec-api</module>
-        <module>transactions</module>
+        <!--module>transactions</module-->
         <module>undertow</module>
         <module>servlet-build</module>
         <module>web-common</module>
@@ -301,8 +301,8 @@
         <module>servlet-feature-pack</module>
         <module>webservices</module>
         <module>weld</module>
-        <module>xts</module>
-        <module>rts</module>
+        <!--module>xts</module>
+        <module>rts</module-->
         <module>testsuite/shared</module>
         <module>testsuite</module>
     </modules>
@@ -4669,6 +4669,11 @@
                         <artifactId>jboss-as-console-resources</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.openjdk-orb</groupId>
+                <artifactId>openjdk-orb</artifactId>
+                <version>${version.org.jboss.openjdk-orb}</version>
             </dependency>
             <dependency>
                 <groupId>org.jboss.seam.integration</groupId>

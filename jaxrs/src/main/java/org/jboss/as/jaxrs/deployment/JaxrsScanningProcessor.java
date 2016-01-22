@@ -33,6 +33,7 @@ import java.util.Set;
 
 import javax.ws.rs.core.Application;
 
+import org.apache.cxf.jaxrs.servlet.CXFNonSpringJaxrsServlet;
 import org.jboss.as.jaxrs.JaxrsAnnotations;
 import org.jboss.as.jaxrs.logging.JaxrsLogger;
 import org.jboss.as.server.deployment.Attachments;
@@ -56,6 +57,7 @@ import org.jboss.modules.ModuleLoadException;
 /*import org.jboss.resteasy.plugins.server.servlet.HttpServlet30Dispatcher;
 import org.jboss.resteasy.plugins.server.servlet.ResteasyBootstrapClasses;
 import org.jboss.resteasy.plugins.server.servlet.ResteasyContextParameters;*/
+
 
 import static org.jboss.as.jaxrs.logging.JaxrsLogger.JAXRS_LOGGER;
 /*import static org.jboss.resteasy.plugins.server.servlet.ResteasyContextParameters.RESTEASY_SCAN;
@@ -97,7 +99,7 @@ public class JaxrsScanningProcessor implements DeploymentUnitProcessor {
         try {
 
             if (warMetaData == null) {
-            	jaxrsDeploymentData.setScanAll(true);
+                jaxrsDeploymentData.setScanAll(true);
                 scan(deploymentUnit, module.getClassLoader(), jaxrsDeploymentData);
                 deploymentData.put(moduleIdentifier, jaxrsDeploymentData);
             } else {
@@ -292,7 +294,7 @@ public class JaxrsScanningProcessor implements DeploymentUnitProcessor {
                 throw new DeploymentUnitProcessingException(e);
             }
             if (Application.class.isAssignableFrom(clazz)) {
-                servlet.setServletClass(HttpServlet30Dispatcher.class.getName());
+                servlet.setServletClass(CXFNonSpringJaxrsServlet.class.getName());
                 servlet.setAsyncSupported(true);
                 ParamValueMetaData param = new ParamValueMetaData();
                 param.setParamName("javax.ws.rs.Application");

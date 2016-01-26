@@ -26,7 +26,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataOutput;
+//import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataOutput;
 
 /**
  * @author Stuart Douglas
@@ -34,12 +34,12 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataOutput;
 @Path("/form")
 public class MultipartResource {
 
-    @GET
-    @Produces("multipart/related")
-    public MultipartFormDataOutput get() {
-        MultipartFormDataOutput output = new MultipartFormDataOutput();
-        output.addPart("Hello", MediaType.TEXT_PLAIN_TYPE);
-        output.addPart("World", MediaType.TEXT_PLAIN_TYPE);
-        return output;
-    }
+//    @GET
+//    @Produces("multipart/related")
+//    public MultipartFormDataOutput get() {
+//        MultipartFormDataOutput output = new MultipartFormDataOutput();
+//        output.addPart("Hello", MediaType.TEXT_PLAIN_TYPE);
+//        output.addPart("World", MediaType.TEXT_PLAIN_TYPE);
+//        return output;
+//    }
 }

@@ -25,18 +25,18 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
-import org.jboss.resteasy.annotations.GZIP;
+//import org.jboss.resteasy.annotations.GZIP;
 
 @Path("helloworld")
 public class GZIPResource {
     @GET
-    @GZIP
+//    @GZIP
     public String getMessage() {
         return "Hello World!";
     }
     
     @GET
-    @GZIP
+//    @GZIP
     @Path("xml")
     @Produces({"application/xml"})
     public JaxbModel getXml() {

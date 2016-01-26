@@ -33,6 +33,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPInputStream;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
@@ -53,6 +54,7 @@ import org.junit.runner.RunWith;
  */
 @RunWith(Arquillian.class)
 @RunAsClient
+@Ignore("Move this test to JBWS and use @org.apache.cxf.annotations.GZIP instead of @org.jboss.resteasy.annotations.GZIP")
 public class BasicGZIPTestCase {
 
     private static final Properties gzipProp = new Properties();

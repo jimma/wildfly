@@ -26,7 +26,7 @@ import io.undertow.servlet.api.DeploymentInfo;
 import io.undertow.servlet.api.DeploymentManager;
 import io.undertow.servlet.api.ListenerInfo;
 import io.undertow.servlet.api.ServletContainer;
-import io.undertow.servlet.api.ServletInfo;
+//import io.undertow.servlet.api.ServletInfo;
 
 import java.net.Inet4Address;
 import java.util.Map;
@@ -37,8 +37,8 @@ import javax.servlet.ServletException;
 import org.jboss.as.network.SocketBinding;
 import org.jboss.jbossts.star.service.ContextListener;
 import org.jboss.msc.value.InjectedValue;
-import org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher;
-import org.jboss.resteasy.plugins.server.servlet.ResteasyBootstrap;
+//import org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher;
+//import org.jboss.resteasy.plugins.server.servlet.ResteasyBootstrap;
 import org.wildfly.extension.rts.logging.RTSLogger;
 import org.wildfly.extension.undertow.Host;
 
@@ -68,8 +68,8 @@ public class AbstractRTSService {
         deploymentInfo.setClassLoader(ParticipantService.class.getClassLoader());
         deploymentInfo.setContextPath(contextPath);
         deploymentInfo.setDeploymentName(name);
-        deploymentInfo.addServlets(getResteasyServlet());
-        deploymentInfo.addListener(getResteasyListener());
+//        deploymentInfo.addServlets(getResteasyServlet());
+//        deploymentInfo.addListener(getResteasyListener());
         deploymentInfo.addListener(getRestATListener());
 
         for (Entry<String, String> entry : initialParameters.entrySet()) {
@@ -111,18 +111,18 @@ public class AbstractRTSService {
         }
     }
 
-    private ServletInfo getResteasyServlet() {
-        final ServletInfo servletInfo = new ServletInfo("Resteasy", HttpServletDispatcher.class);
-        servletInfo.addMapping("/*");
-
-        return servletInfo;
-    }
-
-    private ListenerInfo getResteasyListener() {
-        final ListenerInfo listenerInfo = new ListenerInfo(ResteasyBootstrap.class);
-
-        return listenerInfo;
-    }
+//    private ServletInfo getResteasyServlet() {
+//        final ServletInfo servletInfo = new ServletInfo("Resteasy", HttpServletDispatcher.class);
+//        servletInfo.addMapping("/*");
+//
+//        return servletInfo;
+//    }
+//
+//    private ListenerInfo getResteasyListener() {
+//        final ListenerInfo listenerInfo = new ListenerInfo(ResteasyBootstrap.class);
+//
+//        return listenerInfo;
+//    }
 
     private ListenerInfo getRestATListener() {
         final ListenerInfo listenerInfo = new ListenerInfo(ContextListener.class);

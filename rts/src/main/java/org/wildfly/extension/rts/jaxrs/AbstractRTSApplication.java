@@ -26,35 +26,35 @@ import java.util.Set;
 
 import javax.ws.rs.core.Application;
 
-import org.jboss.resteasy.core.AcceptHeaderByFileSuffixFilter;
-import org.jboss.resteasy.plugins.interceptors.encoding.AcceptEncodingGZIPFilter;
-import org.jboss.resteasy.plugins.interceptors.encoding.AcceptEncodingGZIPInterceptor;
-import org.jboss.resteasy.plugins.interceptors.encoding.GZIPDecodingInterceptor;
-import org.jboss.resteasy.plugins.interceptors.encoding.GZIPEncodingInterceptor;
-import org.jboss.resteasy.plugins.providers.DataSourceProvider;
-import org.jboss.resteasy.plugins.providers.DefaultTextPlain;
-import org.jboss.resteasy.plugins.providers.DocumentProvider;
-import org.jboss.resteasy.plugins.providers.FileProvider;
-import org.jboss.resteasy.plugins.providers.FormUrlEncodedProvider;
-import org.jboss.resteasy.plugins.providers.IIOImageProvider;
-import org.jboss.resteasy.plugins.providers.InputStreamProvider;
-import org.jboss.resteasy.plugins.providers.JaxrsFormProvider;
-import org.jboss.resteasy.plugins.providers.SerializableProvider;
-import org.jboss.resteasy.plugins.providers.StringTextStar;
-import org.jboss.resteasy.plugins.providers.jaxb.CollectionProvider;
-import org.jboss.resteasy.plugins.providers.jaxb.JAXBElementProvider;
-import org.jboss.resteasy.plugins.providers.jaxb.JAXBXmlRootElementProvider;
-import org.jboss.resteasy.plugins.providers.jaxb.JAXBXmlSeeAlsoProvider;
-import org.jboss.resteasy.plugins.providers.jaxb.JAXBXmlTypeProvider;
-import org.jboss.resteasy.plugins.providers.jaxb.MapProvider;
-import org.jboss.resteasy.plugins.providers.jaxb.XmlJAXBContextFinder;
-import org.jboss.resteasy.plugins.providers.jaxb.json.JettisonElementProvider;
-import org.jboss.resteasy.plugins.providers.jaxb.json.JettisonXmlRootElementProvider;
-import org.jboss.resteasy.plugins.providers.jaxb.json.JettisonXmlSeeAlsoProvider;
-import org.jboss.resteasy.plugins.providers.jaxb.json.JettisonXmlTypeProvider;
-import org.jboss.resteasy.plugins.providers.jaxb.json.JsonCollectionProvider;
-import org.jboss.resteasy.plugins.providers.jaxb.json.JsonJAXBContextFinder;
-import org.jboss.resteasy.plugins.providers.jaxb.json.JsonMapProvider;
+//import org.jboss.resteasy.core.AcceptHeaderByFileSuffixFilter;
+//import org.jboss.resteasy.plugins.interceptors.encoding.AcceptEncodingGZIPFilter;
+//import org.jboss.resteasy.plugins.interceptors.encoding.AcceptEncodingGZIPInterceptor;
+//import org.jboss.resteasy.plugins.interceptors.encoding.GZIPDecodingInterceptor;
+//import org.jboss.resteasy.plugins.interceptors.encoding.GZIPEncodingInterceptor;
+//import org.jboss.resteasy.plugins.providers.DataSourceProvider;
+//import org.jboss.resteasy.plugins.providers.DefaultTextPlain;
+//import org.jboss.resteasy.plugins.providers.DocumentProvider;
+//import org.jboss.resteasy.plugins.providers.FileProvider;
+//import org.jboss.resteasy.plugins.providers.FormUrlEncodedProvider;
+//import org.jboss.resteasy.plugins.providers.IIOImageProvider;
+//import org.jboss.resteasy.plugins.providers.InputStreamProvider;
+//import org.jboss.resteasy.plugins.providers.JaxrsFormProvider;
+//import org.jboss.resteasy.plugins.providers.SerializableProvider;
+//import org.jboss.resteasy.plugins.providers.StringTextStar;
+//import org.jboss.resteasy.plugins.providers.jaxb.CollectionProvider;
+//import org.jboss.resteasy.plugins.providers.jaxb.JAXBElementProvider;
+//import org.jboss.resteasy.plugins.providers.jaxb.JAXBXmlRootElementProvider;
+//import org.jboss.resteasy.plugins.providers.jaxb.JAXBXmlSeeAlsoProvider;
+//import org.jboss.resteasy.plugins.providers.jaxb.JAXBXmlTypeProvider;
+//import org.jboss.resteasy.plugins.providers.jaxb.MapProvider;
+//import org.jboss.resteasy.plugins.providers.jaxb.XmlJAXBContextFinder;
+//import org.jboss.resteasy.plugins.providers.jaxb.json.JettisonElementProvider;
+//import org.jboss.resteasy.plugins.providers.jaxb.json.JettisonXmlRootElementProvider;
+//import org.jboss.resteasy.plugins.providers.jaxb.json.JettisonXmlSeeAlsoProvider;
+//import org.jboss.resteasy.plugins.providers.jaxb.json.JettisonXmlTypeProvider;
+//import org.jboss.resteasy.plugins.providers.jaxb.json.JsonCollectionProvider;
+//import org.jboss.resteasy.plugins.providers.jaxb.json.JsonJAXBContextFinder;
+//import org.jboss.resteasy.plugins.providers.jaxb.json.JsonMapProvider;
 
 /**
  *
@@ -79,16 +79,16 @@ public abstract class AbstractRTSApplication extends Application {
         Set<Class<?>> providers = new HashSet<>();
 
         // Message body writers / readers
-        providers.add(DocumentProvider.class);
-        providers.add(FormUrlEncodedProvider.class);
-        providers.add(DefaultTextPlain.class);
-        providers.add(SerializableProvider.class);
-        providers.add(FileProvider.class);
-        providers.add(InputStreamProvider.class);
-        providers.add(JaxrsFormProvider.class);
-        providers.add(StringTextStar.class);
-        providers.add(IIOImageProvider.class);
-        providers.add(DataSourceProvider.class);
+//        providers.add(DocumentProvider.class);
+//        providers.add(FormUrlEncodedProvider.class);
+//        providers.add(DefaultTextPlain.class);
+//        providers.add(SerializableProvider.class);
+//        providers.add(FileProvider.class);
+//        providers.add(InputStreamProvider.class);
+//        providers.add(JaxrsFormProvider.class);
+//        providers.add(StringTextStar.class);
+//        providers.add(IIOImageProvider.class);
+//        providers.add(DataSourceProvider.class);
 
         return providers;
     }
@@ -96,11 +96,11 @@ public abstract class AbstractRTSApplication extends Application {
     private Set<Class<?>> getDefaultInterceptors() {
         Set<Class<?>> providers = new HashSet<>();
 
-        providers.add(AcceptHeaderByFileSuffixFilter.class);
-        providers.add(AcceptEncodingGZIPFilter.class);
-        providers.add(GZIPEncodingInterceptor.class);
-        providers.add(AcceptEncodingGZIPInterceptor.class);
-        providers.add(GZIPDecodingInterceptor.class);
+//        providers.add(AcceptHeaderByFileSuffixFilter.class);
+//        providers.add(AcceptEncodingGZIPFilter.class);
+//        providers.add(GZIPEncodingInterceptor.class);
+//        providers.add(AcceptEncodingGZIPInterceptor.class);
+//        providers.add(GZIPDecodingInterceptor.class);
 
         return providers;
     }
@@ -109,15 +109,15 @@ public abstract class AbstractRTSApplication extends Application {
         Set<Class<?>> providers = new HashSet<>();
 
         // Message body writers / readers
-        providers.add(CollectionProvider.class);
-        providers.add(JAXBXmlRootElementProvider.class);
-        providers.add(JAXBXmlSeeAlsoProvider.class);
-        providers.add(JAXBXmlTypeProvider.class);
-        providers.add(JAXBElementProvider.class);
-        providers.add(MapProvider.class);
+//        providers.add(CollectionProvider.class);
+//        providers.add(JAXBXmlRootElementProvider.class);
+//        providers.add(JAXBXmlSeeAlsoProvider.class);
+//        providers.add(JAXBXmlTypeProvider.class);
+//        providers.add(JAXBElementProvider.class);
+//        providers.add(MapProvider.class);
 
         // Context resolvers
-        providers.add(XmlJAXBContextFinder.class);
+//        providers.add(XmlJAXBContextFinder.class);
 
         return providers;
     }
@@ -125,13 +125,13 @@ public abstract class AbstractRTSApplication extends Application {
     private Set<Class<?>> getJettisonProviders() {
         Set<Class<?>> providers = new HashSet<>();
 
-        providers.add(JettisonElementProvider.class);
-        providers.add(JettisonXmlTypeProvider.class);
-        providers.add(JsonMapProvider.class);
-        providers.add(JettisonXmlRootElementProvider.class);
-        providers.add(JettisonXmlSeeAlsoProvider.class);
-        providers.add(JsonCollectionProvider.class);
-        providers.add(JsonJAXBContextFinder.class);
+//        providers.add(JettisonElementProvider.class);
+//        providers.add(JettisonXmlTypeProvider.class);
+//        providers.add(JsonMapProvider.class);
+//        providers.add(JettisonXmlRootElementProvider.class);
+//        providers.add(JettisonXmlSeeAlsoProvider.class);
+//        providers.add(JsonCollectionProvider.class);
+//        providers.add(JsonJAXBContextFinder.class);
 
         return providers;
     }

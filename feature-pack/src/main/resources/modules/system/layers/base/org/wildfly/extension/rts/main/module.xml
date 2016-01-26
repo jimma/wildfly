@@ -57,9 +57,6 @@
         <module name="io.undertow.servlet"/>
         <module name="org.wildfly.extension.undertow"/>
         <module name="javax.ws.rs.api"/>
-        <module name="org.jboss.resteasy.resteasy-jaxrs"/>
-        <module name="org.jboss.resteasy.resteasy-jaxb-provider"/>
-        <module name="org.jboss.resteasy.resteasy-jettison-provider"/>
 
         <module name="org.jboss.narayana.rts"/>
 

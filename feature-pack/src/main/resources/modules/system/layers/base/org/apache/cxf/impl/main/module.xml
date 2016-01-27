@@ -51,6 +51,7 @@
         <artifact name="${org.apache.cxf:cxf-rt-ws-policy}"/>
         <artifact name="${org.apache.cxf:cxf-rt-ws-rm}"/>
         <artifact name="${org.apache.cxf:cxf-rt-ws-security?jandex}"/>
+        <artifact name="${org.apache.cxf:cxf-rt-rs-client}"/>
         <artifact name="${org.apache.cxf:cxf-rt-rs-extension-providers}"/>
         <artifact name="${org.apache.cxf:cxf-rt-rs-json-basic}"/>
         <artifact name="${org.apache.cxf:cxf-tools-common}"/>

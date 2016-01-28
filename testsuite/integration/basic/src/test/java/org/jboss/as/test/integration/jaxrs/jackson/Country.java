@@ -35,7 +35,7 @@ import java.io.Serializable;
 
 
 @XmlRootElement(name = "Country")
-@XmlType(name = "Country", propOrder = {"name", "awesomeness"})
+@XmlType(name = "Country", propOrder = {"name", "temperature"})
 @JsonAutoDetect({JsonMethod.NONE})
 @JsonPropertyOrder({"name", "temperature"})
 public class Country implements Serializable {
@@ -44,6 +44,10 @@ public class Country implements Serializable {
     private String name;
     private String temperature;
 
+    public Country() {
+
+    }
+    
     public Country(final Integer id, final String name, final String temperature) {
         this.id = id;
         this.name = name;

@@ -67,7 +67,7 @@ public class JaxrsJacksonProviderTestCase {
         return HttpRequest.get(url + urlPattern, 10, TimeUnit.SECONDS);
     }
 
-    //TODO:"CXF returns {\"customer\":{\"first\":\"John\",\"last\":\"Citizen\"}}\"")
+    //TODO: Fix cxf to respect jackson annotation and select JacksonProvider to read/write
     @Test
     public void testSimpleJacksonResource() throws Exception {
         String result = performCall("myjaxrs/jackson");
@@ -77,8 +77,7 @@ public class JaxrsJacksonProviderTestCase {
     /**
      * AS7-1276
      */
-    @Test
-    //TODO: CXF returns {\"Country\":{\"name\":\"Australia\",\"temperature\":\"Hot\"}}\"")  
+    @Test 
     public void testJacksonWithJsonIgnore() throws Exception {
         String result = performCall("myjaxrs/country");
         Assert.assertEquals("{\"name\":\"Australia\",\"temperature\":\"Hot\"}", result);

@@ -44,7 +44,7 @@ import org.junit.runner.RunWith;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Tests for RESTEasy configuration parameter 'resteasy.scan.resources'
+ * Tests for RESTEasy configuration parameter 'jaxrs.scan.resources'
  * 
  * @author Pavel Janousek
  */
@@ -63,42 +63,42 @@ public class ResteasyScanResourcesTestCase {
     public static Archive<?> deploy_true() {
         return ShrinkWrap.create(WebArchive.class, depNameTrue + ".war")
                 .addClasses(ResteasyScanResourcesTestCase.class, HelloWorldResource.class)
-                .setWebXML(webXmlWithMapping("resteasy.scan.resources", "true"));
+                .setWebXML(webXmlWithMapping("jaxrs.scan.resources", "true"));
     }
 
     @Deployment(name = depNameFalse, managed = true)
     public static Archive<?> deploy_false() {
         return ShrinkWrap.create(WebArchive.class, depNameFalse + ".war")
                 .addClasses(ResteasyScanResourcesTestCase.class, HelloWorldResource.class)
-                .setWebXML(webXmlWithMapping("resteasy.scan.resources", "false"));
+                .setWebXML(webXmlWithMapping("jaxrs.scan.resources", "false"));
     }
 
     @Deployment(name = depNameInvalid, managed = false)
     public static Archive<?> deploy_invalid() {
         return ShrinkWrap.create(WebArchive.class, depNameInvalid + ".war")
                 .addClasses(ResteasyScanResourcesTestCase.class, HelloWorldResource.class)
-                .setWebXML(webXmlWithMapping("resteasy.scan.resources", "blah"));
+                .setWebXML(webXmlWithMapping("jaxrs.scan.resources", "blah"));
     }
 
     @Deployment(name = depNameTrueApp, managed = true)
     public static Archive<?> deploy_true_app() {
         return ShrinkWrap.create(WebArchive.class, depNameTrueApp + ".war")
                 .addClasses(ResteasyScanResourcesTestCase.class, HelloWorldResource.class, HelloWorldApplication.class)
-                .setWebXML(webXml("resteasy.scan.resources", "true"));
+                .setWebXML(webXml("jaxrs.scan.resources", "true"));
     }
 
     @Deployment(name = depNameFalseApp, managed = true)
     public static Archive<?> deploy_false_app() {
         return ShrinkWrap.create(WebArchive.class, depNameFalseApp + ".war")
                 .addClasses(ResteasyScanResourcesTestCase.class, HelloWorldResource.class, HelloWorldApplication.class)
-                .setWebXML(webXml("resteasy.scan.resources", "false"));
+                .setWebXML(webXml("jaxrs.scan.resources", "false"));
     }
 
     @Deployment(name = depNameInvalidApp, managed = false)
     public static Archive<?> deploy_invalid_app() {
         return ShrinkWrap.create(WebArchive.class, depNameInvalidApp + ".war")
                 .addClasses(ResteasyScanResourcesTestCase.class, HelloWorldResource.class, HelloWorldApplication.class)
-                .setWebXML(webXml("resteasy.scan.resources", "blah"));
+                .setWebXML(webXml("jaxrs.scan.resources", "blah"));
     }
 
     private static StringAsset webXml(final String paramName, final String paramValue) {
@@ -142,7 +142,7 @@ public class ResteasyScanResourcesTestCase {
     public void testDeployInvalid() throws Exception {
         try {
             deployer.deploy(depNameInvalid);
-            Assert.fail("Test should not go here - invalid deployment (invalid value of resteasy.scan.resources)!");
+            Assert.fail("Test should not go here - invalid deployment (invalid value of jaxrs.scan.resources)!");
         } catch (Exception e) {
         }
     }
@@ -170,7 +170,7 @@ public class ResteasyScanResourcesTestCase {
     public void testDeployInvalidApp() throws Exception {
         try {
             deployer.deploy(depNameInvalidApp);
-            Assert.fail("Test should not go here - invalid deployment (invalid value of resteasy.scan.resources)!");
+            Assert.fail("Test should not go here - invalid deployment (invalid value of jaxrs.scan.resources)!");
         } catch (Exception e) {
         }
     }

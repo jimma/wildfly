@@ -38,14 +38,13 @@ import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import static org.junit.Assert.assertEquals;
 
 /**
- * Tests for RESTEasy configuration parameter 'resteasy.scan.providers'
+ * Tests for RESTEasy configuration parameter 'jaxrs.scan.providers'
  * 
  * @author Pavel Janousek
  */
@@ -66,7 +65,7 @@ public class ResteasyScanProvidersTestCase {
 				.create(WebArchive.class, depNameTrue + ".war")
 				.addClasses(ResteasyScanProvidersTestCase.class,
 						HelloWorldResource.class)
-				.setWebXML(webXmlwithMapping("resteasy.scan.providers", "true"));
+				.setWebXML(webXmlwithMapping("jaxrs.scan.providers", "true"));
 	}
 
 	@Deployment(name = depNameFalse, managed = true)
@@ -75,7 +74,7 @@ public class ResteasyScanProvidersTestCase {
 				.create(WebArchive.class, depNameFalse + ".war")
 				.addClasses(ResteasyScanProvidersTestCase.class,
 						HelloWorldResource.class)
-				.setWebXML(webXmlwithMapping("resteasy.scan.providers", "false"));
+				.setWebXML(webXmlwithMapping("jaxrs.scan.providers", "false"));
 	}
 
 	@Deployment(name = depNameInvalid, managed = false)
@@ -84,7 +83,7 @@ public class ResteasyScanProvidersTestCase {
 				.create(WebArchive.class, depNameInvalid + ".war")
 				.addClasses(ResteasyScanProvidersTestCase.class,
 						HelloWorldResource.class)
-				.setWebXML(webXmlwithMapping("resteasy.scan.providers", "blah"));
+				.setWebXML(webXmlwithMapping("jaxrs.scan.providers", "blah"));
 
 	}
 
@@ -94,7 +93,7 @@ public class ResteasyScanProvidersTestCase {
 				.create(WebArchive.class, depNameTrueApp + ".war")
 				.addClasses(ResteasyScanProvidersTestCase.class,
 						HelloWorldResource.class, HelloWorldApplication.class)
-				.setWebXML(webXml("resteasy.scan.providers", "true"));
+				.setWebXML(webXml("jaxrs.scan.providers", "true"));
 	}
 
 	@Deployment(name = depNameFalseApp, managed = true)
@@ -103,7 +102,7 @@ public class ResteasyScanProvidersTestCase {
 				.create(WebArchive.class, depNameFalseApp + ".war")
 				.addClasses(ResteasyScanProvidersTestCase.class,
 						HelloWorldResource.class, HelloWorldApplication.class)
-				.setWebXML(webXml("resteasy.scan.providers", "false"));
+				.setWebXML(webXml("jaxrs.scan.providers", "false"));
 	}
 
 	@Deployment(name = depNameInvalidApp, managed = false)
@@ -112,7 +111,7 @@ public class ResteasyScanProvidersTestCase {
 				.create(WebArchive.class, depNameInvalidApp + ".war")
 				.addClasses(ResteasyScanProvidersTestCase.class,
 						HelloWorldResource.class, HelloWorldApplication.class)
-				.setWebXML(webXml("resteasy.scan.providers", "blah"));
+				.setWebXML(webXml("jaxrs.scan.providers", "blah"));
 
 	}
 
@@ -165,7 +164,7 @@ public class ResteasyScanProvidersTestCase {
 	public void testDeployInvalid() throws Exception {
 		try {
 			deployer.deploy(depNameInvalid);
-			Assert.fail("Test should not go here - invalid deployment (invalid value of resteasy.scan.providers)!");
+			Assert.fail("Test should not go here - invalid deployment (invalid value of jaxrs.scan.providers)!");
 		} catch (Exception e) {
 		}
 	}
@@ -191,7 +190,7 @@ public class ResteasyScanProvidersTestCase {
 	public void testDeployInvalidApp() throws Exception {
 		try {
 			deployer.deploy(depNameInvalidApp);
-			Assert.fail("Test should not go here - invalid deployment (invalid value of resteasy.scan.providers)!");
+			Assert.fail("Test should not go here - invalid deployment (invalid value of jaxrs.scan.providers)!");
 		} catch (Exception e) {
 		}
 	}

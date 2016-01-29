@@ -50,7 +50,7 @@ import static org.junit.Assert.assertEquals;
  */
 @RunWith(Arquillian.class)
 @RunAsClient
-public class ResteasyScanResourcesTestCase {
+public class JaxRsScanResourcesTestCase {
 
     private static final String depNameTrue = "dep_true";
     private static final String depNameFalse = "dep_false";
@@ -62,42 +62,42 @@ public class ResteasyScanResourcesTestCase {
     @Deployment(name = depNameTrue, managed = true)
     public static Archive<?> deploy_true() {
         return ShrinkWrap.create(WebArchive.class, depNameTrue + ".war")
-                .addClasses(ResteasyScanResourcesTestCase.class, HelloWorldResource.class)
+                .addClasses(JaxRsScanResourcesTestCase.class, HelloWorldResource.class)
                 .setWebXML(webXmlWithMapping("jaxrs.scan.resources", "true"));
     }
 
     @Deployment(name = depNameFalse, managed = true)
     public static Archive<?> deploy_false() {
         return ShrinkWrap.create(WebArchive.class, depNameFalse + ".war")
-                .addClasses(ResteasyScanResourcesTestCase.class, HelloWorldResource.class)
+                .addClasses(JaxRsScanResourcesTestCase.class, HelloWorldResource.class)
                 .setWebXML(webXmlWithMapping("jaxrs.scan.resources", "false"));
     }
 
     @Deployment(name = depNameInvalid, managed = false)
     public static Archive<?> deploy_invalid() {
         return ShrinkWrap.create(WebArchive.class, depNameInvalid + ".war")
-                .addClasses(ResteasyScanResourcesTestCase.class, HelloWorldResource.class)
+                .addClasses(JaxRsScanResourcesTestCase.class, HelloWorldResource.class)
                 .setWebXML(webXmlWithMapping("jaxrs.scan.resources", "blah"));
     }
 
     @Deployment(name = depNameTrueApp, managed = true)
     public static Archive<?> deploy_true_app() {
         return ShrinkWrap.create(WebArchive.class, depNameTrueApp + ".war")
-                .addClasses(ResteasyScanResourcesTestCase.class, HelloWorldResource.class, HelloWorldApplication.class)
+                .addClasses(JaxRsScanResourcesTestCase.class, HelloWorldResource.class, HelloWorldApplication.class)
                 .setWebXML(webXml("jaxrs.scan.resources", "true"));
     }
 
     @Deployment(name = depNameFalseApp, managed = true)
     public static Archive<?> deploy_false_app() {
         return ShrinkWrap.create(WebArchive.class, depNameFalseApp + ".war")
-                .addClasses(ResteasyScanResourcesTestCase.class, HelloWorldResource.class, HelloWorldApplication.class)
+                .addClasses(JaxRsScanResourcesTestCase.class, HelloWorldResource.class, HelloWorldApplication.class)
                 .setWebXML(webXml("jaxrs.scan.resources", "false"));
     }
 
     @Deployment(name = depNameInvalidApp, managed = false)
     public static Archive<?> deploy_invalid_app() {
         return ShrinkWrap.create(WebArchive.class, depNameInvalidApp + ".war")
-                .addClasses(ResteasyScanResourcesTestCase.class, HelloWorldResource.class, HelloWorldApplication.class)
+                .addClasses(JaxRsScanResourcesTestCase.class, HelloWorldResource.class, HelloWorldApplication.class)
                 .setWebXML(webXml("jaxrs.scan.resources", "blah"));
     }
 

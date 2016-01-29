@@ -58,13 +58,11 @@ import org.jboss.as.jaxrs.JaxrsExtension;
 /**
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
  * @author Stuart Douglas
+ * @author <a href="mailto:alessio.soldano@jboss.com">Alessio Soldano</a>
  */
 public class JaxrsIntegrationProcessor implements DeploymentUnitProcessor {
     private static final String JAX_RS_SERVLET_NAME = "javax.ws.rs.core.Application";
     private static final String SERVLET_INIT_PARAM = "javax.ws.rs.Application";
-//    public static final String RESTEASY_SCAN = "resteasy.scan";
-//    public static final String RESTEASY_SCAN_RESOURCES = "resteasy.scan.resources";
-//    public static final String RESTEASY_SCAN_PROVIDERS = "resteasy.scan.providers";
 
     @Override
     public void deploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
@@ -88,31 +86,6 @@ public class JaxrsIntegrationProcessor implements DeploymentUnitProcessor {
             return;
 
         deploymentUnit.getDeploymentSubsystemModel(JaxrsExtension.SUBSYSTEM_NAME);
-//        //remove the resteasy.scan parameter
-//        //because it is not needed
-//        final List<ParamValueMetaData> params = webdata.getContextParams();
-//        boolean entityExpandEnabled = false;
-//        if (params != null) {
-//            Iterator<ParamValueMetaData> it = params.iterator();
-//            while (it.hasNext()) {
-//                final ParamValueMetaData param = it.next();
-//                if (param.getParamName().equals(RESTEASY_SCAN)) {
-//                    it.remove();
-//                } else if (param.getParamName().equals(RESTEASY_SCAN_RESOURCES)) {
-//                    it.remove();
-//                } else if (param.getParamName().equals(RESTEASY_SCAN_PROVIDERS)) {
-//                    it.remove();
-//                } else if(param.getParamName().equals(ResteasyContextParameters.RESTEASY_EXPAND_ENTITY_REFERENCES)) {
-//                    entityExpandEnabled = true;
-//                }
-//            }
-//        }
-//
-//        //don't expand entity references by default
-//        if(!entityExpandEnabled) {
-//            setContextParameter(webdata, ResteasyContextParameters.RESTEASY_EXPAND_ENTITY_REFERENCES, "false");
-//        }
-
 
         final Map<ModuleIdentifier, JAXRSDeploymentMetadata> attachmentMap = parent.getAttachment(JaxrsAttachments.ADDITIONAL_JAXRS_DEPLOYMENT_DATA);
         final List<JAXRSDeploymentMetadata> additionalData = new ArrayList<JAXRSDeploymentMetadata>();
@@ -196,7 +169,6 @@ public class JaxrsIntegrationProcessor implements DeploymentUnitProcessor {
             setJBossWSServlet(servlet);
             servlet.setAsyncSupported(true);
             addServlet(webdata, servlet);
-//            setServletMappingPrefix(webdata, JAX_RS_SERVLET_NAME, servlet);
             return;
         }
 
@@ -213,38 +185,21 @@ public class JaxrsIntegrationProcessor implements DeploymentUnitProcessor {
             setServletInitParam(servlet, SERVLET_INIT_PARAM, applicationClass.getName());
             addServlet(webdata, servlet);
             if (!servletMappingsExist(webdata, servletName)) {
-//                try {
-                    //no mappings, add our own
-                    List<String> patterns = new ArrayList<String>();
-                    //for some reason the spec requires this to be decoded
-//                    String pathValue = URLDecoder.decode(applicationClass.getAnnotation(ApplicationPath.class).value().trim(), "UTF-8");
-//                    if (!pathValue.startsWith("/")) {
-//                        pathValue = "/" + pathValue;
-//                    }
-//                    String prefix = pathValue;
-//                    if (pathValue.endsWith("/")) {
-//                        pathValue += "*";
-//                    } else {
-//                        pathValue += "/*";
-//                    }
-//                    patterns.add(pathValue);
-                    patterns.add("/*");
-//                    setServletInitParam(servlet, "resteasy.servlet.mapping.prefix", prefix); //TODO!!!
-                    ServletMappingMetaData mapping = new ServletMappingMetaData();
-                    mapping.setServletName(servletName);
-                    mapping.setUrlPatterns(patterns);
-                    if (webdata.getServletMappings() == null) {
-                        webdata.setServletMappings(new ArrayList<ServletMappingMetaData>());
-                    }
-                    webdata.getServletMappings().add(mapping);
-//                } catch (UnsupportedEncodingException e) {
-//                    throw new RuntimeException(e);
-//                }
+                //no mappings, add our own
+                List<String> patterns = new ArrayList<String>();
+                //for some reason the spec requires this to be decoded
+                patterns.add("/*");
+                ServletMappingMetaData mapping = new ServletMappingMetaData();
+                mapping.setServletName(servletName);
+                mapping.setUrlPatterns(patterns);
+                if (webdata.getServletMappings() == null) {
+                    webdata.setServletMappings(new ArrayList<ServletMappingMetaData>());
+                }
+                webdata.getServletMappings().add(mapping);
             } else {
                if (isURLPatternSet(webdata, servletName)) {
                   jaxrsDepMD.setIgnoreApplicationPath(true);
                }
-//                setServletMappingPrefix(webdata, servletName, servlet);
             }
 
         }
@@ -288,33 +243,6 @@ public class JaxrsIntegrationProcessor implements DeploymentUnitProcessor {
        }
        return mappingSet;
     }
-
-
-//    private void setServletMappingPrefix(JBossWebMetaData webdata, String servletName, JBossServletMetaData servlet) {
-//        final List<ServletMappingMetaData> mappings = webdata.getServletMappings();
-//        if (mappings != null) {
-//            boolean mappingSet = false;
-//            for (final ServletMappingMetaData mapping : mappings) {
-//                if (mapping.getServletName().equals(servletName)) {
-//                    if (mapping.getUrlPatterns() != null) {
-//                        for (String pattern : mapping.getUrlPatterns()) {
-//                            if (mappingSet) {
-//                                JAXRS_LOGGER.moreThanOneServletMapping(servletName, pattern);
-//                            } else {
-//                                mappingSet = true;
-//                                String realPattern = pattern;
-//                                if (realPattern.endsWith("*")) {
-//                                    realPattern = realPattern.substring(0, realPattern.length() - 1);
-//                                }
-//                                setServletInitParam(servlet, "resteasy.servlet.mapping.prefix", realPattern); //TODO!!!!
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }
-
 
     private void addServlet(JBossWebMetaData webdata, JBossServletMetaData servlet) {
         if (webdata.getServlets() == null) {

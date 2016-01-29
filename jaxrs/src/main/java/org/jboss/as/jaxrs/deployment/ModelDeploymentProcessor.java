@@ -21,6 +21,8 @@
  */
 package org.jboss.as.jaxrs.deployment;
 
+import org.jboss.as.ee.structure.DeploymentType;
+import org.jboss.as.ee.structure.DeploymentTypeMarker;
 import org.jboss.as.jaxrs.logging.JaxrsLogger;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
@@ -44,7 +46,7 @@ public final class ModelDeploymentProcessor implements DeploymentUnitProcessor {
    public void deploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException
    {
       final DeploymentUnit unit = phaseContext.getDeploymentUnit();
-      if (JaxrsDeploymentMarker.isJaxrsDeployment(unit))
+      if (JaxrsDeploymentMarker.isJaxrsDeployment(unit) && DeploymentTypeMarker.isType(DeploymentType.WAR, unit))
       {
          Deployment dep = newDeployment(unit);
          unit.putAttachment(JaxrsAttachments.JAXRS_DEPLOYMENT_KEY, dep);

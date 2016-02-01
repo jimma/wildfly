@@ -80,6 +80,7 @@
         <module name="javax.servlet.api" />
         <module name="javax.wsdl4j.api" />
         <module name="javax.xml.bind.api" services="import"/>
+        <module name="com.fasterxml.jackson.jaxrs.jackson-jaxrs-json-provider"/>
         <module name="com.sun.xml.bind" services="import"/>
         <module name="javax.xml.soap.api" />
         <module name="javax.xml.stream.api" />

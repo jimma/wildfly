@@ -24,11 +24,14 @@ package org.jboss.as.test.integration.jaxrs.jettison;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import org.jboss.ws.api.annotation.NoJackson;
 
 /**
  * @author Pavel Janousek
  */
 @Path("/jettison")
+@NoJackson
+//TODO:resolve jackson provider conflict
 public class JettisonResource {
 
     @GET

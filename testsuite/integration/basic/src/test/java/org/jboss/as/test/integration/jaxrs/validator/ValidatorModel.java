@@ -22,19 +22,26 @@
 package org.jboss.as.test.integration.jaxrs.validator;
 
 import javax.validation.constraints.Max;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * @author Stuart Douglas
  */
+@XmlRootElement(name = "validator")
 public class ValidatorModel {
 
     @Max(10)
     private int id;
+    
+    public ValidatorModel() {
+    }
 
     public ValidatorModel(final int id) {
         this.id = id;
     }
 
+    @XmlAttribute
     public int getId() {
         return id;
     }

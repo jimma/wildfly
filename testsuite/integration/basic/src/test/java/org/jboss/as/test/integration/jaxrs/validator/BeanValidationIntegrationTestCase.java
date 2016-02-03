@@ -81,7 +81,7 @@ public class BeanValidationIntegrationTestCase {
         HttpResponse result = client.execute(get);
 
         Assert.assertEquals(200, result.getStatusLine().getStatusCode());
-        Assert.assertEquals("ValidatorModel{id=5}", EntityUtils.toString(result.getEntity()));
+        Assert.assertTrue(EntityUtils.toString(result.getEntity()).contains("<validator id=\"5\"/>"));
     }
 
     @Test

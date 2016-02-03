@@ -29,7 +29,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
 @Path("validate/{id}")
-@Produces("text/plain")
+@Produces("application/xml")
 public class ValidatorResource {
 
     @Valid

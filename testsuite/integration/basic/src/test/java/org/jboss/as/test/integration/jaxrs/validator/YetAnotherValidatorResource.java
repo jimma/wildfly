@@ -30,7 +30,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
 @Path("yet-another-validate/{id}")
-@Produces("text/plain")
+@Produces("application/xml")
 public class YetAnotherValidatorResource {
 
     @GET

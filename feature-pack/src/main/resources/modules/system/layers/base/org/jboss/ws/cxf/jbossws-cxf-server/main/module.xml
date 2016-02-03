@@ -42,6 +42,8 @@
         <module name="javax.xml.stream.api" />
         <module name="javax.xml.ws.api" />
         <module name="javax.ws.rs.api" />
+        <module name="javax.validation.api" />
+        <module name="com.fasterxml.classmate"/>
         <module name="com.fasterxml.jackson.jaxrs.jackson-jaxrs-json-provider" />
         <module name="org.jboss.ws.api" />
         <module name="org.jboss.ws.spi" />

@@ -5181,6 +5181,10 @@
                         <artifactId>log4j</artifactId>
                     </exclusion>
                     <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-log4j12</artifactId>
+                    </exclusion>
+                    <exclusion>
                         <groupId>org.jboss.ws.cxf</groupId>
                         <artifactId>jbossws-cxf-transports-httpserver</artifactId>
                     </exclusion>

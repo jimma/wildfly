@@ -23,6 +23,7 @@ package org.jboss.as.jaxrs.deployment;
 
 import org.jboss.as.ee.structure.DeploymentType;
 import org.jboss.as.ee.structure.DeploymentTypeMarker;
+import org.jboss.as.ee.weld.WeldDeploymentMarker;
 import org.jboss.as.jaxrs.logging.JaxrsLogger;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
@@ -51,6 +52,10 @@ public final class ModelDeploymentProcessor implements DeploymentUnitProcessor {
          Deployment dep = newDeployment(unit);
          unit.putAttachment(JaxrsAttachments.JAXRS_DEPLOYMENT_KEY, dep);
          dep.addAttachment(JAXRSDeploymentMetadata.class, unit.getAttachment(JaxrsAttachments.JAXRS_DEPLOYMENT_DATA));
+         if (WeldDeploymentMarker.isWeldDeployment(unit)) {
+             //TODO: Refactor this
+             dep.setProperty("isWeldDeployment", true);
+         }
       }
    }
 

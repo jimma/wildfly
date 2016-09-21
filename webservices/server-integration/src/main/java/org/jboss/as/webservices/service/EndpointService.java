@@ -84,6 +84,12 @@ public final class EndpointService implements Service<Endpoint> {
     private final InjectedValue<SecurityDomainContext> securityDomainContextValue = new InjectedValue<SecurityDomainContext>();
     private final InjectedValue<AbstractServerConfig> serverConfigServiceValue = new InjectedValue<AbstractServerConfig>();
     private final InjectedValue<EJBViewMethodSecurityAttributesService> ejbMethodSecurityAttributeServiceValue = new InjectedValue<EJBViewMethodSecurityAttributesService>();
+    private static boolean isElytron = false;
+    static {
+        ServiceController<?> otherDomain = currentServiceContainer().getService(WSServices.ElYTRON_APP_SECURITYDOMAIN.append("other"));
+        isElytron = (otherDomain != null);
+    }
+
     private EndpointService(final Endpoint endpoint, final ServiceName name) {
         this.endpoint = endpoint;
         this.name = name;
@@ -105,7 +111,11 @@ public final class EndpointService implements Service<Endpoint> {
     @Override
     public void start(final StartContext context) throws StartException {
         WSLogger.ROOT_LOGGER.starting(name);
-        endpoint.setSecurityDomainContext(new SecurityDomainContextAdaptor(securityDomainContextValue.getValue()));
+        if (isElytron) {
+
+        } else {
+            endpoint.setSecurityDomainContext(new SecurityDomainContextAdaptor(securityDomainContextValue.getValue()));
+        }
         if (EndpointType.JAXWS_EJB3.equals(endpoint.getType())) {
             final EJBViewMethodSecurityAttributesService ejbMethodSecurityAttributeService = ejbMethodSecurityAttributeServiceValue.getValue();
             endpoint.addAttachment(EJBMethodSecurityAttributeProvider.class, new EJBMethodSecurityAttributesAdaptor(ejbMethodSecurityAttributeService));
@@ -215,9 +225,13 @@ public final class EndpointService implements Service<Endpoint> {
         final ServiceBuilder<Endpoint> builder = serviceTarget.addService(serviceName, service);
         final ServiceName alias = WSServices.ENDPOINT_SERVICE.append(context.toString()).append(propEndpoint);
         builder.addAliases(alias);
-        builder.addDependency(DependencyType.REQUIRED,
-                SecurityDomainService.SERVICE_NAME.append(getDeploymentSecurityDomainName(endpoint)),
-                SecurityDomainContext.class, service.getSecurityDomainContextInjector());
+        if (isElytron) {
+            // TODO:
+        } else {
+            builder.addDependency(DependencyType.REQUIRED,
+                    SecurityDomainService.SERVICE_NAME.append(getDeploymentSecurityDomainName(endpoint)),
+                    SecurityDomainContext.class, service.getSecurityDomainContextInjector());
+        }
         builder.addDependency(DependencyType.REQUIRED, WSServices.CONFIG_SERVICE, AbstractServerConfig.class,
                 service.getAbstractServerConfigInjector());
         if (EndpointType.JAXWS_EJB3.equals(endpoint.getType())) {

@@ -37,7 +37,7 @@ import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.webservices.logging.WSLogger;
 import org.jboss.as.webservices.metadata.model.EJBEndpoint;
 import org.jboss.as.webservices.security.EJBMethodSecurityAttributesAdaptor;
-import org.jboss.as.webservices.security.SecurityDomainContextAdaptor;
+import org.jboss.as.webservices.security.SecurityDomainContextImpl;
 import org.jboss.as.webservices.util.ASHelper;
 import org.jboss.as.webservices.util.WSAttachmentKeys;
 import org.jboss.as.webservices.util.WSServices;
@@ -112,9 +112,10 @@ public final class EndpointService implements Service<Endpoint> {
     public void start(final StartContext context) throws StartException {
         WSLogger.ROOT_LOGGER.starting(name);
         if (isElytron) {
-
+           //TODO: Elytron securityDomainService is not intended to expose for other subystem to use. What is the good approach for 
+           //other subsystem use to do security check
         } else {
-            endpoint.setSecurityDomainContext(new SecurityDomainContextAdaptor(securityDomainContextValue.getValue()));
+            endpoint.setSecurityDomainContext(new SecurityDomainContextImpl(securityDomainContextValue.getValue()));
         }
         if (EndpointType.JAXWS_EJB3.equals(endpoint.getType())) {
             final EJBViewMethodSecurityAttributesService ejbMethodSecurityAttributeService = ejbMethodSecurityAttributeServiceValue.getValue();
@@ -226,7 +227,14 @@ public final class EndpointService implements Service<Endpoint> {
         final ServiceName alias = WSServices.ENDPOINT_SERVICE.append(context.toString()).append(propEndpoint);
         builder.addAliases(alias);
         if (isElytron) {
-            // TODO:
+            //what we should get here ? Elytron's Domain service is not the 
+            //DomainService domainSerivce = org.wildfly.security.security-domain.ManagementDomain
+            /*
+            final InjectedValue<SecurityDomain> securityDomainInjector = new InjectedValue<SecurityDomain>();
+            serviceBuilder.addDependency(context.getCapabilityServiceName(
+                    buildDynamicCapabilityName(SECURITY_DOMAIN_CAPABILITY, securityDomain), SecurityDomain.class),
+                    SecurityDomain.class, securityDomainInjector);
+            */
         } else {
             builder.addDependency(DependencyType.REQUIRED,
                     SecurityDomainService.SERVICE_NAME.append(getDeploymentSecurityDomainName(endpoint)),

@@ -84,17 +84,10 @@ public final class EndpointService implements Service<Endpoint> {
     private final InjectedValue<SecurityDomainContext> securityDomainContextValue = new InjectedValue<SecurityDomainContext>();
     private final InjectedValue<AbstractServerConfig> serverConfigServiceValue = new InjectedValue<AbstractServerConfig>();
     private final InjectedValue<EJBViewMethodSecurityAttributesService> ejbMethodSecurityAttributeServiceValue = new InjectedValue<EJBViewMethodSecurityAttributesService>();
-    private static boolean isElytron = false;
-    static {
-        ServiceController<?> otherDomain = currentServiceContainer().getService(WSServices.ElYTRON_APP_SECURITYDOMAIN.append("other"));
-        isElytron = (otherDomain != null);
-    }
-
     private EndpointService(final Endpoint endpoint, final ServiceName name) {
         this.endpoint = endpoint;
         this.name = name;
     }
-
     @Override
     public Endpoint getValue() {
         return endpoint;
@@ -111,10 +104,7 @@ public final class EndpointService implements Service<Endpoint> {
     @Override
     public void start(final StartContext context) throws StartException {
         WSLogger.ROOT_LOGGER.starting(name);
-        if (isElytron) {
-           //TODO: Elytron securityDomainService is not intended to expose for other subystem to use. What is the good approach for 
-           //other subsystem use to do security check
-        } else {
+        if (!isElytronSecurityDomain(endpoint)) {
             endpoint.setSecurityDomainContext(new SecurityDomainContextImpl(securityDomainContextValue.getValue()));
         }
         if (EndpointType.JAXWS_EJB3.equals(endpoint.getType())) {
@@ -226,16 +216,8 @@ public final class EndpointService implements Service<Endpoint> {
         final ServiceBuilder<Endpoint> builder = serviceTarget.addService(serviceName, service);
         final ServiceName alias = WSServices.ENDPOINT_SERVICE.append(context.toString()).append(propEndpoint);
         builder.addAliases(alias);
-        if (isElytron) {
-            //what we should get here ? Elytron's Domain service is not the 
-            //DomainService domainSerivce = org.wildfly.security.security-domain.ManagementDomain
-            /*
-            final InjectedValue<SecurityDomain> securityDomainInjector = new InjectedValue<SecurityDomain>();
-            serviceBuilder.addDependency(context.getCapabilityServiceName(
-                    buildDynamicCapabilityName(SECURITY_DOMAIN_CAPABILITY, securityDomain), SecurityDomain.class),
-                    SecurityDomain.class, securityDomainInjector);
-            */
-        } else {
+        if (!isElytronSecurityDomain(endpoint)) {
+            // This is still picketbox jaas securityDomainContext
             builder.addDependency(DependencyType.REQUIRED,
                     SecurityDomainService.SERVICE_NAME.append(getDeploymentSecurityDomainName(endpoint)),
                     SecurityDomainContext.class, service.getSecurityDomainContextInjector());
@@ -297,6 +279,13 @@ public final class EndpointService implements Service<Endpoint> {
             return CurrentServiceContainer.getServiceContainer();
         }
         return AccessController.doPrivileged(CurrentServiceContainer.GET_ACTION);
+    }
+
+    private static boolean isElytronSecurityDomain(Endpoint endpoint) {
+        String domianName = getDeploymentSecurityDomainName(endpoint);
+        ServiceController<?> otherDomain = currentServiceContainer().getService(
+                WSServices.ElYTRON_APP_SECURITYDOMAIN.append(domianName));
+        return otherDomain != null;
     }
 
 }

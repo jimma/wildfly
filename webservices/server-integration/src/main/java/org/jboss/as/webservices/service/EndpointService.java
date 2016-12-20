@@ -40,7 +40,7 @@ import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.webservices.logging.WSLogger;
 import org.jboss.as.webservices.metadata.model.EJBEndpoint;
 import org.jboss.as.webservices.security.EJBMethodSecurityAttributesAdaptor;
-import org.jboss.as.webservices.security.ElytronSecurityDomainContextIml;
+import org.jboss.as.webservices.security.ElytronSecurityDomainContextImpl;
 import org.jboss.as.webservices.security.SecurityDomainContextImpl;
 import org.jboss.as.webservices.util.ASHelper;
 import org.jboss.as.webservices.util.WSAttachmentKeys;
@@ -119,9 +119,9 @@ public final class EndpointService implements Service<Endpoint> {
         WSLogger.ROOT_LOGGER.starting(name);
         if (isElytronSecurityDomain(endpoint)) {
             if (EndpointType.JAXWS_EJB3.equals(endpoint.getType())) {
-                endpoint.setSecurityDomainContext(new ElytronSecurityDomainContextIml(this.ejbApplicationSecurityDomainValue.getValue().getSecurityDomain()));
+                endpoint.setSecurityDomainContext(new ElytronSecurityDomainContextImpl(this.ejbApplicationSecurityDomainValue.getValue().getSecurityDomain()));
             } else {
-                endpoint.setSecurityDomainContext(new ElytronSecurityDomainContextIml(this.elytronSecurityDomain.getValue()));
+                endpoint.setSecurityDomainContext(new ElytronSecurityDomainContextImpl(this.elytronSecurityDomain.getValue()));
             }
         } else {
             endpoint.setSecurityDomainContext(new SecurityDomainContextImpl(securityDomainContextValue.getValue()));

@@ -25,6 +25,7 @@ import java.security.AccessController;
 import java.security.Principal;
 import java.security.PrivilegedAction;
 import java.util.Set;
+import java.util.concurrent.Callable;
 
 import javax.security.auth.Subject;
 
@@ -110,12 +111,16 @@ public final class SecurityDomainContextImpl implements org.jboss.wsf.spi.securi
      */
     private static void setSecurityContextOnAssociation(final SecurityContext sc) {
         AccessController.doPrivileged(new PrivilegedAction<Void>() {
-
             @Override
             public Void run() {
                 SecurityContextAssociation.setSecurityContext(sc);
                 return null;
             }
         });
+    }
+
+    //subject will be pushed in thread local context, so directly run this action
+    public void runAs(Callable<Void> action) throws Exception {
+        action.call();
     }
 }

@@ -28,6 +28,7 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.concurrent.Callable;
 
 import javax.security.auth.Subject;
 
@@ -39,11 +40,12 @@ import org.wildfly.security.auth.server.SecurityIdentity;
 import org.wildfly.security.auth.server.ServerAuthenticationContext;
 import org.wildfly.security.evidence.PasswordGuessEvidence;
 
-public class ElytronSecurityDomainContextIml implements SecurityDomainContext {
+public class ElytronSecurityDomainContextImpl implements SecurityDomainContext {
 
     private SecurityDomain securityDomain;
+    private ThreadLocal<SecurityIdentity> currentIdentity = new ThreadLocal<SecurityIdentity>();
 
-    public ElytronSecurityDomainContextIml(SecurityDomain securityDomain) {
+    public ElytronSecurityDomainContextImpl(SecurityDomain securityDomain) {
         this.securityDomain = securityDomain;
     }
 
@@ -90,9 +92,19 @@ public class ElytronSecurityDomainContextIml implements SecurityDomainContext {
                 principals.add(new SimpleGroup(role, identity.getPrincipal()));
             });
         }
+        currentIdentity.set(identity);
         return true;
     }
-    //TODO:deprecate this after elytron?
+
+    public void runAs(Callable<Void> action) throws Exception {
+        if (currentIdentity.get() != null) {
+            //there is no security constrains in servlet and directly with jaas
+            currentIdentity.get().runAs(action);
+        } else {
+            //undertow's ElytronRunAsHandler will propagate the SecurityIndentity to SecurityDomain and directly run this action
+            action.call();
+        }
+    }
     @Override
     public void pushSubjectContext(Subject arg0, Principal arg1, Object arg2) {
 

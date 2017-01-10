@@ -33,6 +33,7 @@ import java.util.concurrent.Callable;
 import javax.security.auth.Subject;
 
 import org.jboss.as.webservices.logging.WSLogger;
+import org.jboss.as.webservices.util.SubjectUtil;
 import org.jboss.wsf.spi.security.SecurityDomainContext;
 import org.wildfly.security.auth.server.RealmUnavailableException;
 import org.wildfly.security.auth.server.SecurityDomain;
@@ -49,17 +50,17 @@ public class ElytronSecurityDomainContextImpl implements SecurityDomainContext {
         this.securityDomain = securityDomain;
     }
 
-    //TODO:deprecate this after elytron?
+    //TODO:deprecate this after elytron
     @Override
     public boolean doesUserHaveRole(Principal principal, Set<Principal> principals) {
         return true;
     }
-    //TODO:deprecate this after elytron?
+    //TODO:refactor/deprecate this after elytron
     @Override
     public String getSecurityDomain() {
         return this.securityDomain.toString();
     }
-    //TODO:deprecate this after elytron?
+    //TODO:refactor/deprecate this after elytron?
     @Override
     public Set<Principal> getUserRoles(Principal principal) {
         return null;
@@ -78,20 +79,7 @@ public class ElytronSecurityDomainContextImpl implements SecurityDomainContext {
         if (identity == null) {
             return false;
         }
-        Set<Principal> principals = subject.getPrincipals();
-        principals.add(identity.getPrincipal());
-        subject.getPublicCredentials().add(identity.getPublicCredentials());
-        subject.getPrivateCredentials().add(identity.getPrivateCredentials());
-        if (!identity.getRoles().isEmpty()) {
-            identity.getRoles().forEach(name -> {
-                principals.add(new SimpleGroup(name, identity.getPrincipal()));
-            });
-        } else {
-            //if it's PicketBoxBasedIdentity.
-            identity.getAttributes().get("Roles").forEach(role -> {
-                principals.add(new SimpleGroup(role, identity.getPrincipal()));
-            });
-        }
+        SubjectUtil.fromSecurityIdentity(identity, subject);
         currentIdentity.set(identity);
         return true;
     }

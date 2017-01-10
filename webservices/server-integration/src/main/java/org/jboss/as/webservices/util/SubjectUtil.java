@@ -27,7 +27,6 @@ import java.util.Set;
 
 import javax.security.auth.Subject;
 
-import org.wildfly.common.Assert;
 import org.wildfly.security.auth.principal.NamePrincipal;
 import org.wildfly.security.auth.server.SecurityIdentity;
 import org.wildfly.security.credential.Credential;
@@ -55,9 +54,7 @@ public final class SubjectUtil {
     public static Subject fromSecurityIdentity(final SecurityIdentity securityIdentity) {
         return fromSecurityIdentity(securityIdentity, new Subject());
     }
-    
     public static Subject fromSecurityIdentity(final SecurityIdentity securityIdentity, Subject subject) {
-        Assert.checkNotNullParam("securityIdentity", securityIdentity);
         if (subject == null) {
             subject = new Subject();
         }

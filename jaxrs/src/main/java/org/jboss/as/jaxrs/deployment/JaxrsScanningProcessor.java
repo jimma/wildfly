@@ -187,23 +187,12 @@ public class JaxrsScanningProcessor implements DeploymentUnitProcessor {
         }
 
         // check resteasy configuration flags
-
         List<ParamValueMetaData> contextParams = webdata.getContextParams();
+        setDeploymentParam(resteasyDeploymentData, contextParams);
 
-        if (contextParams != null) {
-            for (ParamValueMetaData param : contextParams) {
-                if (param.getParamName().equals(RESTEASY_SCAN)) {
-                    resteasyDeploymentData.setScanAll(valueOf(RESTEASY_SCAN, param.getParamValue()));
-                } else if (param.getParamName().equals(ResteasyContextParameters.RESTEASY_SCAN_PROVIDERS)) {
-                    resteasyDeploymentData.setScanProviders(valueOf(RESTEASY_SCAN_PROVIDERS, param.getParamValue()));
-                } else if (param.getParamName().equals(RESTEASY_SCAN_RESOURCES)) {
-                    resteasyDeploymentData.setScanResources(valueOf(RESTEASY_SCAN_RESOURCES, param.getParamValue()));
-                } else if (param.getParamName().equals(ResteasyContextParameters.RESTEASY_UNWRAPPED_EXCEPTIONS)) {
-                    resteasyDeploymentData.setUnwrappedExceptionsParameterSet(true);
-                }
-            }
-        }
-
+        //boot servlet init param overrides the value from context params
+        List<ParamValueMetaData> servletInitParams = getBootClassInitParam(webdata);
+        setDeploymentParam(resteasyDeploymentData, servletInitParams);
     }
 
     protected void scan(final DeploymentUnit du, final ClassLoader classLoader, final ResteasyDeploymentData resteasyDeploymentData)
@@ -344,6 +333,32 @@ public class JaxrsScanningProcessor implements DeploymentUnitProcessor {
             return false;
         } else {
             throw JaxrsLogger.JAXRS_LOGGER.invalidParamValue(paramName, value);
+        }
+    }
+
+    private List<ParamValueMetaData> getBootClassInitParam(final JBossWebMetaData webData) {
+        for (ServletMetaData servlet : webData.getServlets()) {
+            String servletClass = servlet.getServletClass();
+            if (BOOT_CLASSES.contains(servletClass)) {
+                return servlet.getInitParam();
+            }
+        }
+        return null;
+    }
+
+    private void setDeploymentParam(ResteasyDeploymentData resteasyDeploymentData, List<ParamValueMetaData> params) throws DeploymentUnitProcessingException {
+        if (params != null) {
+            for (ParamValueMetaData param : params) {
+                if (param.getParamName().equals(RESTEASY_SCAN)) {
+                    resteasyDeploymentData.setScanAll(valueOf(RESTEASY_SCAN, param.getParamValue()));
+                } else if (param.getParamName().equals(ResteasyContextParameters.RESTEASY_SCAN_PROVIDERS)) {
+                    resteasyDeploymentData.setScanProviders(valueOf(RESTEASY_SCAN_PROVIDERS, param.getParamValue()));
+                } else if (param.getParamName().equals(RESTEASY_SCAN_RESOURCES)) {
+                    resteasyDeploymentData.setScanResources(valueOf(RESTEASY_SCAN_RESOURCES, param.getParamValue()));
+                } else if (param.getParamName().equals(ResteasyContextParameters.RESTEASY_UNWRAPPED_EXCEPTIONS)) {
+                    resteasyDeploymentData.setUnwrappedExceptionsParameterSet(true);
+                }
+            }
         }
     }
 

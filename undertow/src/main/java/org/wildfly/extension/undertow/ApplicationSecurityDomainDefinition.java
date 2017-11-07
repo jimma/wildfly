@@ -365,7 +365,7 @@ public class ApplicationSecurityDomainDefinition extends PersistentResourceDefin
         return knownApplicationSecurityDomains::contains;
     }
 
-    private static class ApplicationSecurityDomainService implements Service<BiFunction<DeploymentInfo, Function<String, RunAsIdentityMetaData>, Registration>> {
+    public static class ApplicationSecurityDomainService implements Service<BiFunction<DeploymentInfo, Function<String, RunAsIdentityMetaData>, Registration>> {
 
         private final boolean overrideDeploymentConfig;
         private final InjectedValue<HttpAuthenticationFactory> httpAuthenticationFactoryInjector = new InjectedValue<>();
@@ -373,7 +373,6 @@ public class ApplicationSecurityDomainDefinition extends PersistentResourceDefin
         private final Set<RegistrationImpl> registrations = new HashSet<>();
         private final boolean enableJacc;
         private SecurityDomain securityDomain;
-
         private HttpAuthenticationFactory httpAuthenticationFactory;
 
         private ApplicationSecurityDomainService(final boolean overrideDeploymentConfig, boolean enableJacc) {
@@ -395,6 +394,9 @@ public class ApplicationSecurityDomainDefinition extends PersistentResourceDefin
         @Override
         public BiFunction<DeploymentInfo, Function<String, RunAsIdentityMetaData>, Registration> getValue() throws IllegalStateException, IllegalArgumentException {
             return this::applyElytronSecurity;
+        }
+        public SecurityDomain getSecurityDomain() {
+            return securityDomain;
         }
 
         private Injector<HttpAuthenticationFactory> getHttpAuthenticationFactoryInjector() {

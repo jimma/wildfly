@@ -25,6 +25,7 @@ import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.enterprise.inject.spi.BeanManager;
 import javax.management.JMException;
 import javax.management.MBeanServer;
 
@@ -45,6 +46,7 @@ import org.jboss.as.webservices.security.SecurityDomainContextImpl;
 import org.jboss.as.webservices.util.ASHelper;
 import org.jboss.as.webservices.util.WSAttachmentKeys;
 import org.jboss.as.webservices.util.WSServices;
+import org.jboss.as.weld.services.BeanManagerService;
 import org.jboss.metadata.web.jboss.JBossWebMetaData;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
@@ -99,6 +101,7 @@ public final class EndpointService implements Service<Endpoint> {
     private final InjectedValue<ApplicationSecurityDomainService.ApplicationSecurityDomain> ejbApplicationSecurityDomainValue = new InjectedValue<ApplicationSecurityDomainService.ApplicationSecurityDomain>();
     private final InjectedValue<EJBViewMethodSecurityAttributesService> ejbMethodSecurityAttributeServiceValue = new InjectedValue<EJBViewMethodSecurityAttributesService>();
     private final InjectedValue<SecurityDomain> elytronSecurityDomain = new InjectedValue<>();
+    private final InjectedValue<BeanManager> beanManager = new InjectedValue<BeanManager>();
 
     private EndpointService(final Endpoint endpoint, final ServiceName name) {
         this.endpoint = endpoint;
@@ -138,6 +141,10 @@ public final class EndpointService implements Service<Endpoint> {
         final List<RecordProcessor> processors = endpoint.getRecordProcessors();
         for (final RecordProcessor processor : processors) {
             registerRecordProcessor(processor, endpoint);
+        }
+        //Inecerptor CDI injection
+        if (beanManager.getOptionalValue() != null) {
+            endpoint.addAttachment(BeanManager.class, beanManager.getValue());
         }
         final EndpointMetricsFactory factory = SPIProvider.getInstance().getSPI(EndpointMetricsFactory.class);
         endpoint.setEndpointMetrics(factory.newEndpointMetrics());
@@ -238,6 +245,10 @@ public final class EndpointService implements Service<Endpoint> {
         return ejbMethodSecurityAttributeServiceValue;
     }
 
+    public Injector<BeanManager> getBeanManagerInjector() {
+        return beanManager;
+    }
+
     public static void install(final ServiceTarget serviceTarget, final Endpoint endpoint, final DeploymentUnit unit) {
         final ServiceName serviceName = getServiceName(unit, endpoint.getShortName());
         final String propContext = endpoint.getName().getKeyProperty(Endpoint.SEPID_PROPERTY_CONTEXT);
@@ -272,6 +283,7 @@ public final class EndpointService implements Service<Endpoint> {
             builder.addDependency(DependencyType.OPTIONAL, getEJBViewMethodSecurityAttributesServiceName(unit, endpoint),
                     EJBViewMethodSecurityAttributesService.class, service.getEJBMethodSecurityAttributeServiceInjector());
         }
+        builder.addDependency(DependencyType.OPTIONAL, BeanManagerService.serviceName(unit), BeanManager.class, service.getBeanManagerInjector());
         builder.setInitialMode(Mode.ACTIVE);
         builder.install();
         //add a dependency on the endpoint service to web deployments, so that the

@@ -80,7 +80,7 @@ public class WSTrustTestCaseSecuritySetupTask implements ServerSetupTask {
     }
 
     private void removeHttpsListener(List<ModelNode> operations) throws Exception {
-        ModelNode removeOp = createOpNode("socket-binding-group=standard-sockets/socket-binding=https2" + HTTPS_LISTENER_NAME, REMOVE);
+        ModelNode removeOp = createOpNode("socket-binding-group=standard-sockets/socket-binding=https2", REMOVE);
         operations.add(removeOp);
         removeOp = createOpNode("subsystem=undertow/server=default-server/https-listener=" + HTTPS_LISTENER_NAME, REMOVE);
         operations.add(removeOp);

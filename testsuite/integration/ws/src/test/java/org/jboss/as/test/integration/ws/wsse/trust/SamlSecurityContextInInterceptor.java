@@ -22,7 +22,6 @@
 package org.jboss.as.test.integration.ws.wsse.trust;
 
 import org.apache.cxf.binding.soap.SoapMessage;
-import org.apache.cxf.common.security.SecurityToken;
 import org.apache.cxf.common.security.SimplePrincipal;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.security.DefaultSecurityContext;
@@ -45,7 +44,6 @@ public class SamlSecurityContextInInterceptor extends WSS4JInInterceptor {
 
    @Override
    public void handleMessage(SoapMessage message) throws Fault {
-      final SecurityToken securityToken = message.get(SecurityToken.class);
       final SecurityContext securityContext = message.get(SecurityContext.class);
       final Principal principal = securityContext.getUserPrincipal();
       final String name = principal.getName();

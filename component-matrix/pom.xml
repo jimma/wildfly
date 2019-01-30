@@ -2805,8 +2805,8 @@
                         <groupId>commons-lang</groupId>
                     </exclusion>
                     <exclusion>
-                        <artifactId>jaxb-api</artifactId>
-                        <groupId>javax.xml.bind</groupId>
+                        <artifactId>jakarta.xml.bind-api</artifactId>
+                        <groupId>jakarta.xml.bind</groupId>
                     </exclusion>
                 </exclusions>
             </dependency>

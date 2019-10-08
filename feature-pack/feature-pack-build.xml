@@ -163,6 +163,9 @@
         <dir name="standalone/tmp/auth"/>
         <dir name=".installation"/>
     </mkdirs>
+    <copy-artifacts>
+        <copy-artifact artifact="com.sun.xml.messaging.saaj:saaj-impl:::1.3.16-jbossorg-1" to-location="modules/system/layers/base/com/sun/xml/messaging/saaj/main/"/>
+    </copy-artifacts>
     <file-permissions>
         <permission value="755">
             <filter pattern="*.sh" include="true"/>

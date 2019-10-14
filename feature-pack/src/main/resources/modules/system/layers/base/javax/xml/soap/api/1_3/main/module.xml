@@ -27,15 +27,13 @@
         <module name="javax.activation.api" export="true"/>
         <module name="javax.api"/>
         <module name="org.jboss.modules"/>
-        <module name="javax.xml.soap.api.1_3" optional="true" export="true"/>
     </dependencies>
 
     <resources>
-        <artifact name="${org.jboss.spec.javax.xml.soap:jboss-saaj-api_1.4_spec}">
+        <artifact name="${org.jboss.spec.javax.xml.soap:jboss-saaj-api_1.3_spec}">
             <conditions>
-                <property-not-equal name="jboss.saaj.api.1_3" value="true"/>
+                <property-equal name="jboss.saaj.api.1_3" value="true"/>
             </conditions>
         </artifact>
     </resources>
-
 </module>

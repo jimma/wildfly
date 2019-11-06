@@ -275,6 +275,7 @@ public class ApplicationSecurityDomainDefinition extends PersistentResourceDefin
             boolean enableJacc = ENABLE_JACC.resolveModelAttribute(context, model).asBoolean();
             boolean enableJaspi = ENABLE_JASPI.resolveModelAttribute(context, model).asBoolean();
             boolean integratedJaspi = INTEGRATED_JASPI.resolveModelAttribute(context, model).asBoolean();
+            Supplier<SecurityDomain> securityDomainSupplier;
 
             String securityDomainName = context.getCurrentAddressValue();
 
@@ -288,8 +289,9 @@ public class ApplicationSecurityDomainDefinition extends PersistentResourceDefin
             if (httpServerMechanismFactory != null) {
                 Supplier<HttpAuthenticationFactory> httpAuthenticationFactorySupplier = serviceBuilder.requires(context.getCapabilityServiceName(REF_HTTP_AUTHENTICATION_FACTORY, HttpAuthenticationFactory.class, httpServerMechanismFactory));
                 factoryFunction = (s) -> httpAuthenticationFactorySupplier.get();
+                securityDomainSupplier = () -> httpAuthenticationFactorySupplier.get().getSecurityDomain();
             } else {
-                Supplier<SecurityDomain> securityDomainSupplier = serviceBuilder.requires(context.getCapabilityServiceName(REF_SECURITY_DOMAIN, SecurityDomain.class, securityDomain));
+                securityDomainSupplier = serviceBuilder.requires(context.getCapabilityServiceName(REF_SECURITY_DOMAIN, SecurityDomain.class, securityDomain));
                 factoryFunction = toHttpAuthenticationFactoryFunction(securityDomainSupplier);
             }
 
@@ -339,7 +341,7 @@ public class ApplicationSecurityDomainDefinition extends PersistentResourceDefin
             }
 
             Consumer<BiFunction<DeploymentInfo, Function<String, RunAsIdentityMetaData>, Registration>> valueConsumer = serviceBuilder.provides(applicationSecurityDomainName);
-            ApplicationSecurityDomainService service = new ApplicationSecurityDomainService(overrideDeploymentConfig, enableJacc, enableJaspi, integratedJaspi, factoryFunction, transformerSupplier, valueConsumer);
+            ApplicationSecurityDomainService service = new ApplicationSecurityDomainService(securityDomainSupplier, overrideDeploymentConfig, enableJacc, enableJaspi, integratedJaspi, factoryFunction, transformerSupplier, valueConsumer);
             serviceBuilder.setInstance(service);
             serviceBuilder.install();
 
@@ -404,7 +406,7 @@ public class ApplicationSecurityDomainDefinition extends PersistentResourceDefin
         return knownApplicationSecurityDomains::contains;
     }
 
-    private static class ApplicationSecurityDomainService implements Service, BiFunction<DeploymentInfo, Function<String, RunAsIdentityMetaData>, Registration> {
+    public static class ApplicationSecurityDomainService implements Service, BiFunction<DeploymentInfo, Function<String, RunAsIdentityMetaData>, Registration> {
 
         private final Function<String, HttpAuthenticationFactory> factoryFunction;
         private final Supplier<UnaryOperator<HttpServerAuthenticationMechanismFactory>> singleSignOnTransformerSupplier;
@@ -416,10 +418,12 @@ public class ApplicationSecurityDomainDefinition extends PersistentResourceDefin
         private final boolean enableJacc;
         private final boolean enableJaspi;
         private final boolean integratedJaspi;
+        private final Supplier<SecurityDomain> securityDomainSupplier;
 
-        private ApplicationSecurityDomainService(final boolean overrideDeploymentConfig, boolean enableJacc, boolean enableJaspi, boolean integratedJaspi,
+        private ApplicationSecurityDomainService(final Supplier<SecurityDomain> securityDomainSupplier,final boolean overrideDeploymentConfig, boolean enableJacc, boolean enableJaspi, boolean integratedJaspi,
                 Function<String, HttpAuthenticationFactory> factoryFunction, Supplier<UnaryOperator<HttpServerAuthenticationMechanismFactory>> singleSignOnTransformerSupplier,
                 Consumer<BiFunction<DeploymentInfo, Function<String, RunAsIdentityMetaData>, Registration>> valueConsumer) {
+            this.securityDomainSupplier = securityDomainSupplier;
             this.overrideDeploymentConfig = overrideDeploymentConfig;
             this.enableJacc = enableJacc;
             this.enableJaspi = enableJaspi;
@@ -453,7 +457,6 @@ public class ApplicationSecurityDomainDefinition extends PersistentResourceDefin
 
             AuthenticationManager authenticationManager = builder.build();
             authenticationManager.configure(deploymentInfo);
-
             RegistrationImpl registration = new RegistrationImpl(deploymentInfo);
             synchronized(registrations) {
                 registrations.add(registration);
@@ -499,6 +502,9 @@ public class ApplicationSecurityDomainDefinition extends PersistentResourceDefin
                 }
             }
 
+        }
+        public SecurityDomain getSecurityDomain() {
+            return securityDomainSupplier.get();
         }
 
     }

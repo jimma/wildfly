@@ -26,6 +26,7 @@ import java.security.Principal;
 import java.security.PrivilegedAction;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.function.Supplier;
 
 import javax.security.auth.Subject;
 
@@ -40,11 +41,15 @@ import org.wildfly.security.evidence.PasswordGuessEvidence;
 
 public class ElytronSecurityDomainContextImpl implements SecurityDomainContext {
 
-    private final SecurityDomain securityDomain;
+    private Supplier<SecurityDomain> securityDomainSupplier;
     private final ThreadLocal<SecurityIdentity> currentIdentity = new ThreadLocal<SecurityIdentity>();
 
+    public ElytronSecurityDomainContextImpl() {
+        securityDomainSupplier = () -> SecurityDomain.getCurrent();
+    }
+
     public ElytronSecurityDomainContextImpl(SecurityDomain securityDomain) {
-        this.securityDomain = securityDomain;
+        securityDomainSupplier = () -> securityDomain;
     }
 
     //TODO:deprecate this after elytron
@@ -55,7 +60,7 @@ public class ElytronSecurityDomainContextImpl implements SecurityDomainContext {
     //TODO:refactor/deprecate this after elytron
     @Override
     public String getSecurityDomain() {
-        return this.securityDomain.toString();
+        return this.securityDomainSupplier.get().toString();
     }
     //TODO:refactor/deprecate this after elytron?
     @Override
@@ -101,7 +106,7 @@ public class ElytronSecurityDomainContextImpl implements SecurityDomainContext {
                 if (credential != null) {
                     subject.getPrivateCredentials().add(credential);
                 }
-                SecurityIdentity securityIdentity = SubjectUtil.convertToSecurityIdentity(subject, pincipal, securityDomain,
+                SecurityIdentity securityIdentity = SubjectUtil.convertToSecurityIdentity(subject, pincipal, securityDomainSupplier.get(),
                         "ejb");
                 currentIdentity.set(securityIdentity);
                 return null;
@@ -111,7 +116,7 @@ public class ElytronSecurityDomainContextImpl implements SecurityDomainContext {
 
     private SecurityIdentity authenticate(final String username, final String password) {
 
-        ServerAuthenticationContext context = this.securityDomain.createNewAuthenticationContext();
+        ServerAuthenticationContext context = this.securityDomainSupplier.get().createNewAuthenticationContext();
         PasswordGuessEvidence evidence = new PasswordGuessEvidence(password != null ? password.toCharArray() : null);
         try {
             context.setAuthenticationName(username);

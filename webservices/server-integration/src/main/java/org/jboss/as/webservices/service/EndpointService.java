@@ -91,6 +91,9 @@ public final class EndpointService implements Service {
     private static final RuntimeCapability<Void> APPLICATION_SECURITY_DOMAIN_RUNTIME_CAPABILITY = RuntimeCapability
             .Builder.of(APPLICATION_SECURITY_DOMAIN_CAPABILITY, true, ApplicationSecurityDomain.class)
             .build();
+    private static final String UNDERTOW_DOMAIN_CAPABILITY_NAME = "org.wildfly.undertow.application-security-domain";
+    private static final RuntimeCapability<Void> UNDERTOW_DOMAIN_CAPABILITY =
+            RuntimeCapability.Builder.of(UNDERTOW_DOMAIN_CAPABILITY_NAME, true, SecurityDomain.class).build();
     private static final String SECURITY_DOMAIN_NAME = "securityDomainName";
     private final Endpoint endpoint;
     private final ServiceName name;
@@ -134,9 +137,11 @@ public final class EndpointService implements Service {
         final String domainName = (String)endpoint.getProperty(SECURITY_DOMAIN_NAME);
         if (isElytronSecurityDomain(endpoint, domainName)) {
             if (EndpointType.JAXWS_EJB3.equals(endpoint.getType())) {
-                endpoint.setSecurityDomainContext(new ElytronSecurityDomainContextImpl(this.ejbApplicationSecurityDomain.get().getSecurityDomain()));
+                endpoint.setSecurityDomainContext(new ElytronSecurityDomainContextImpl(this.ejbApplicationSecurityDomain.get()
+                        .getSecurityDomain()));
             } else {
-                endpoint.setSecurityDomainContext(new ElytronSecurityDomainContextImpl(this.elytronSecurityDomain.get()));
+                // endpoint.setSecurityDomainContext(new ElytronSecurityDomainContextImpl(this.elytronSecurityDomain.get()));
+                endpoint.setSecurityDomainContext(new ElytronSecurityDomainContextImpl());
             }
         } else {
             endpoint.setSecurityDomainContext(new SecurityDomainContextImpl(securityDomainContext.get()));
@@ -253,8 +258,8 @@ public final class EndpointService implements Service {
                         .getCapabilityServiceName(domainName, ApplicationSecurityDomainService.ApplicationSecurityDomain.class);
                 ejbApplicationSecurityDomain = builder.requires(ejbSecurityDomainServiceName);
             } else {
-                ServiceName elytronDomainName = ELYTRON_DOMAIN_CAPABILITY.getCapabilityServiceName(
-                        domainName, SecurityDomain.class);
+                ServiceName elytronDomainName = UNDERTOW_DOMAIN_CAPABILITY.getCapabilityServiceName(
+                        domainName, null);
                 elytronSecurityDomain = builder.requires(elytronDomainName);
             }
         } else {
@@ -326,7 +331,7 @@ public final class EndpointService implements Service {
         if (EndpointType.JAXWS_EJB3.equals(endpoint.getType())) {
             serviceName = APPLICATION_SECURITY_DOMAIN_RUNTIME_CAPABILITY.getCapabilityServiceName(domainName, ApplicationSecurityDomainService.ApplicationSecurityDomain.class);
         } else {
-            serviceName = ELYTRON_DOMAIN_CAPABILITY.getCapabilityServiceName(domainName, SecurityDomain.class);
+            serviceName = UNDERTOW_DOMAIN_CAPABILITY.getCapabilityServiceName(domainName, null);
         }
         return currentServiceContainer().getService(serviceName) != null;
     }

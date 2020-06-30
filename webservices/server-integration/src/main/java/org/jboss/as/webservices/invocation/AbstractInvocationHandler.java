@@ -85,13 +85,6 @@ abstract class AbstractInvocationHandler extends org.jboss.ws.common.invocation.
                     if (cv == null) {
                         throw WSLogger.ROOT_LOGGER.cannotFindComponentView(componentViewName);
                     }
-                    if (reference == null) {
-                        try {
-                            reference = cv.createInstance();
-                        } catch (Exception e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
                     componentView = cv;
                 }
             }
@@ -129,9 +122,7 @@ abstract class AbstractInvocationHandler extends org.jboss.ws.common.invocation.
         // prepare invocation data
         final ComponentView componentView = getComponentView();
         Component component = componentView.getComponent();
-        // in case of @FactoryType annotation we don't need to go into EE interceptors
-        final boolean forceTargetBean = (wsInvocation.getInvocationContext().getProperty("forceTargetBean") != null);
-        if (forceTargetBean) {
+        if (wsInvocation.getInvocationContext().getTargetBean() != null) {
             this.reference = new ManagedReference() {
                 public void release() {
                 }
@@ -144,6 +135,7 @@ abstract class AbstractInvocationHandler extends org.jboss.ws.common.invocation.
                 ((WSComponent) component).setReference(reference);
             }
         }
+
         final Method method = getComponentViewMethod(wsInvocation.getJavaMethod(), componentView.getViewMethods());
         final InterceptorContext context = new InterceptorContext();
         prepareForInvocation(context, wsInvocation);
@@ -154,9 +146,6 @@ abstract class AbstractInvocationHandler extends org.jboss.ws.common.invocation.
         // pull in any XTS transaction
         LocalTransactionContext.getCurrent().importProviderTransaction();
         context.setTransaction(ContextTransactionManager.getInstance().getTransaction());
-        if (forceTargetBean) {
-            context.putPrivateData(ManagedReference.class, reference);
-        }
         // invoke method
         final Object retObj = componentView.invoke(context);
         // set return value

@@ -40,7 +40,6 @@ import org.jboss.wsf.spi.deployment.Endpoint;
  * @author <a href="mailto:ropalka@redhat.com">Richard Opalka</a>
  */
 final class DeploymentModelBuilderJAXWS_POJO extends AbstractDeploymentModelBuilder {
-
     DeploymentModelBuilderJAXWS_POJO() {
         super(JAXWS_JSE);
     }
@@ -62,6 +61,7 @@ final class DeploymentModelBuilderJAXWS_POJO extends AbstractDeploymentModelBuil
             if (ecm != null) {
                 ep.setEndpointConfig(ecm.getConfig(pojoEndpointClassName));
             }
+            markWeldDeployment(unit, ep);
         }
     }
 

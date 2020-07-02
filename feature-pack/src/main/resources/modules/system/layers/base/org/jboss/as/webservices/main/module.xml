@@ -43,6 +43,8 @@
         <module name="javax.jws.api"/>
         <module name="javax.servlet.api"/>
         <module name="javax.xml.ws.api"/>
+        <!-- Only used if capability org.wildfly.weld is available-->
+        <module name="org.jboss.as.weld.common" optional="true"/>
         <module name="org.jboss.invocation"/>
         <module name="org.jboss.jandex"/>
         <module name="org.jboss.metadata.common"/>

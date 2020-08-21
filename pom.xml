@@ -3806,8 +3806,13 @@
                     <exclusion>
                         <groupId>net.sf.ehcache</groupId>
                         <artifactId>ehcache-core</artifactId>
+		    </exclusion>
+		    <exclusion>
+                        <groupId>org.ehcache</groupId>
+			<artifactId>ehcache</artifactId>
                     </exclusion>
-                    <exclusion>
+
+		    <exclusion>
                         <groupId>xml-apis</groupId>
                         <artifactId>xml-apis</artifactId>
                     </exclusion>

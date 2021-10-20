@@ -95,6 +95,7 @@ public final class EndpointService implements Service {
     private static final RuntimeCapability<Void> EJB_APPLICATION_SECURITY_DOMAIN_RUNTIME_CAPABILITY = RuntimeCapability
             .Builder.of(EJB_APPLICATION_SECURITY_DOMAIN, true, ApplicationSecurityDomain.class)
             .build();
+    private static final ServiceName UNDERTOW_APPLICATION_SECURITY_DOMAIN_NAME = ServiceNameFactory.parseServiceName(WEB_APPLICATION_SECURITY_DOMAIN);
     private static final String SECURITY_DOMAIN_NAME = "securityDomainName";
     private static final String ELYTRON_SECURITY_DOMAIN = "elytronSecurityDomain";
     private final Endpoint endpoint;
@@ -259,11 +260,15 @@ public final class EndpointService implements Service {
                         .getCapabilityServiceName(domainName, ApplicationSecurityDomainService.ApplicationSecurityDomain.class);
                 ejbApplicationSecurityDomain = builder.requires(ejbSecurityDomainServiceName);
             } else {
-                ServiceName securityDomainName = unit.getAttachment(Attachments.CAPABILITY_SERVICE_SUPPORT)
-                        .getCapabilityServiceName(
-                                Capabilities.CAPABILITY_APPLICATION_SECURITY_DOMAIN,
-                                domainName).append(Constants.SECURITY_DOMAIN);
-                elytronSecurityDomain = builder.requires(securityDomainName);
+                if (capabilitySupport != null) {
+                    ServiceName securityDomainName = capabilitySupport
+                            .getCapabilityServiceName(
+                                    Capabilities.CAPABILITY_APPLICATION_SECURITY_DOMAIN,
+                                    domainName).append(Constants.SECURITY_DOMAIN);
+                    elytronSecurityDomain = builder.requires(securityDomainName);
+                } else {
+                    builder.requires(UNDERTOW_APPLICATION_SECURITY_DOMAIN_NAME.append(domainName).append(Constants.SECURITY_DOMAIN));
+                }
             }
             endpoint.setProperty(ELYTRON_SECURITY_DOMAIN, true);
         }

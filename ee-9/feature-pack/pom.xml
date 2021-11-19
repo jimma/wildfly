@@ -319,7 +319,7 @@
                             </task-properties>
                             <jakarta-transform>true</jakarta-transform>
                             <!--<jakarta-transform-configs-dir>EXTERNAL_FOLDER</jakarta-transform-configs-dir>-->
-                            <!--<jakarta-transform-verbose>true</jakarta-transform-verbose>-->
+                            <jakarta-transform-verbose>true</jakarta-transform-verbose>
                             <jakarta-transform-excluded-artifacts>
                                 <!-- Don't transform libs that use javax.servlet to provide side
                                      functionality (e.g. consoles or similar) that we do not support. -->

@@ -108,6 +108,7 @@
         <!--version.org.glassfish.jaxb.jaxb-xjc>${version.sun.jaxb}-jbossorg-1</version.org.glassfish.jaxb.jaxb-xjc-->
         <version.org.glassfish.jaxb>3.0.2</version.org.glassfish.jaxb>
         <version.org.glassfish.jaxb.xjc>${version.org.glassfish.jaxb}</version.org.glassfish.jaxb.xjc>
+        <version.jakarta.net.shibboleth.utilities.java-support>8.0.0</version.jakarta.net.shibboleth.utilities.java-support>
         <version.jakarta.org.apache.cxf>4.0.0-SNAPSHOT</version.jakarta.org.apache.cxf>
         <version.jakarta.org.apache.cxf.xjcplugins>4.0.0-SNAPSHOT</version.jakarta.org.apache.cxf.xjcplugins>
         <version.jakarta.org.apache.wss4j>3.0.0-SNAPSHOT</version.jakarta.org.apache.wss4j>
@@ -3307,6 +3308,20 @@
                 <artifactId>opensaml-xmlsec-impl</artifactId>
                 <version>${version.jakarta.org.opensaml.opensaml}</version>
             </dependency>
+
+            <dependency>
+                <groupId>net.shibboleth.utilities</groupId>
+                <artifactId>java-support</artifactId>
+                <version>${version.jakarta.net.shibboleth.utilities.java-support}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.google.code.findbugs</groupId>
+                        <artifactId>jsr305</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+
             <dependency>
                 <groupId>org.apache.myfaces.core</groupId>
                 <artifactId>myfaces-impl</artifactId>

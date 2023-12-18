@@ -123,6 +123,7 @@ public class WSClassVerificationProcessor implements DeploymentUnitProcessor {
                     for (DotName dn : clazz.annotationsMap().keySet()) {
                         if (dn.toString().startsWith("org.apache.cxf")) {
                             WSLogger.ROOT_LOGGER.checkModuleDependency(dn.toString(), clazz.name().toString(), "org.apache.cxf");
+                            return;
                         }
                     }
                 }

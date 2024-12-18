@@ -225,18 +225,8 @@ public interface WSLogger extends BasicLogger {
     @Message(id = 52, value = "Unsupported handler chain type: %s. Supported types are either %s or %s")
     StartException wrongHandlerChainType(String unknownChainType, String knownChainType1, String knownChainType2);
 
-//    @Message(id = 53, value = "Cannot add new handler chain of type %s with id %s. This id is already used in config %s for another chain.")
-//    StartException multipleHandlerChainsWithSameId(String chainType, String handlerChainId, String configId);
-
     @Message(id = 54, value = "Config %s: %s handler chain with id %s doesn't exist")
     OperationFailedException missingHandlerChain(String configName, String handlerChainType, String handlerChainId);
-
-    // @Message(id = 55, value = "Config %s, %s handler chain %s: doesn't contain handler with name %s")
-    // OperationFailedException missingHandler(String configName, String handlerChainType, String handlerChainId, String handlerName);
-
-    //@LogMessage(level = ERROR)
-    //@Message(id = 56, value = "Method invocation failed with exception: %s")
-    //void methodInvocationFailed(@Cause Throwable cause, String message);
 
     @Message(id = 57, value = "Unable to get URL for: %s")
     DeploymentUnitProcessingException cannotGetURLForDescriptor(@Cause Throwable cause, String resourcePath);
@@ -264,10 +254,6 @@ public interface WSLogger extends BasicLogger {
     @Message(id = 64, value = "Could not update WS server configuration because of existing WS deployment on the server.")
     DisabledOperationException couldNotUpdateServerConfigBecauseOfExistingWSDeployment();
 
-    @LogMessage(level = WARN)
-    @Message(id = 65, value = "Annotation '@%s' found on class '%s'. Perhaps you forgot to add a '%s' module dependency to your deployment?")
-    void missingModuleDependency(String annotation, String clazz, String module);
-
     @Message(id = 66, value = "Servlet class %s declared in web.xml; either provide a proper deployment relying on JBossWS or disable the webservices subsystem for the "
             + "current deployment adding a proper jboss-deployment-structure.xml descriptor to it. "
             + "The former approach is recommended, as the latter approach causes most of the webservices Jakarta EE and any JBossWS specific functionality to be disabled.")
@@ -276,12 +262,6 @@ public interface WSLogger extends BasicLogger {
     @LogMessage(level = ERROR)
     @Message(id = 67, value = "Could not activate the webservices subsystem.")
     void couldNotActivateSubsystem(@Cause Throwable cause);
-
-//    @Message(id = 68, value = "Service %s not available")
-//    OperationFailedException serviceNotAvailable(String serviceName);
-
-//    @Message(id = 69, value = "String format password is required")
-//    IllegalArgumentException invalidPasswordType();
 
     @LogMessage(level = DEBUG)
     @Message(id = 70, value = "Authorization failed for user: %s")
@@ -307,4 +287,8 @@ public interface WSLogger extends BasicLogger {
 
     @Message(id = 75, value = "only string password accepted")
     IllegalArgumentException onlyStringPasswordAccepted();
+
+    @LogMessage(level = INFO)
+    @Message(id = 76, value = "Annotation '@%s' found on class '%s'. Please make sure '%s' module dependency is added to your deployment.")
+    void checkModuleDependency(String annotation, String clazz, String module);
 }
